@@ -81,8 +81,8 @@ namespace TodoListDaemon
                         Thread.Sleep(3000);
                     }
 
-                    Console.Write(
-                        String.Format("An error occurred while acquiring a token\nTime: {0}\nError: {1}\nRetry: {2}\n\n",
+                    Console.WriteLine(
+                        String.Format("An error occurred while acquiring a token\nTime: {0}\nError: {1}\nRetry: {2}\n",
                         DateTime.Now.ToString(),
                         ex.ToString(),
                         retry.ToString()));
@@ -92,7 +92,7 @@ namespace TodoListDaemon
 
             if (result == null)
             {
-                Console.Write("Canceling attempt to contact To Do list service.\n\n");
+                Console.WriteLine("Canceling attempt to contact To Do list service.\n");
                 return;
             }
 
@@ -105,18 +105,18 @@ namespace TodoListDaemon
 
             // Forms encode To Do item and POST to the todo list web api.
             string timeNow = DateTime.Now.ToString();
-            Console.Write("Posting to To Do list at " + timeNow + "\n");
+            Console.WriteLine("Posting to To Do list at {0}", timeNow);
             string todoText = "Task at time: " + timeNow;
             HttpContent content = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("Title", todoText) });
             HttpResponseMessage response = await httpClient.PostAsync(todoListBaseAddress + "/api/todolist", content);
 
             if (response.IsSuccessStatusCode == true)
             {
-                Console.Write("Successfully posted new To Do item:  " + todoText + "\n\n");
+                Console.WriteLine("Successfully posted new To Do item:  {0}\n", todoText);
             }
             else
             {
-                Console.Write("Failed to post a new To Do item\nError:  "+ response.ReasonPhrase + "\n\n");
+                Console.WriteLine("Failed to post a new To Do item\nError:  {0}\n", response.ReasonPhrase);
             }
         }
 
@@ -147,8 +147,8 @@ namespace TodoListDaemon
                         Thread.Sleep(3000);
                     }
 
-                    Console.Write(
-                        String.Format("An error occurred while acquiring a token\nTime: {0}\nError: {1}\nRetry: {2}\n\n",
+                    Console.WriteLine(
+                        String.Format("An error occurred while acquiring a token\nTime: {0}\nError: {1}\nRetry: {2}\n",
                         DateTime.Now.ToString(),
                         ex.ToString(),
                         retry.ToString()));
@@ -158,7 +158,7 @@ namespace TodoListDaemon
 
             if (result == null)
             {
-                Console.Write("Canceling attempt to contact To Do list service.\n\n");
+                Console.WriteLine("Canceling attempt to contact To Do list service.\n");
                 return;
             }
             
@@ -170,7 +170,7 @@ namespace TodoListDaemon
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
 
             // Call the To Do list service.
-            Console.Write("Retrieving To Do list at " + DateTime.Now.ToString() + "\n");
+            Console.WriteLine("Retrieving To Do list at {0}", DateTime.Now.ToString());
             HttpResponseMessage response = await httpClient.GetAsync(todoListBaseAddress + "/api/todolist");
 
             if (response.IsSuccessStatusCode)
@@ -183,15 +183,15 @@ namespace TodoListDaemon
                 int count = 0;
                 foreach (TodoItem item in toDoArray)
                 {
-                    Console.Write("Owner: " + item.Owner + "\nItem:  " + item.Title + "\n");
+                    Console.WriteLine("Owner: {0}\nItem:  {1}", item.Owner, item.Title);
                     count++;
                 }
 
-                Console.Write("Total item count:  " + count + "\n\n");
+                Console.WriteLine("Total item count:  {0}\n", count);
             }
             else
             {
-                Console.Write("Failed to retrieve To Do list\nError:  " + response.ReasonPhrase + "\n\n");
+                Console.WriteLine("Failed to retrieve To Do list\nError:  {0}\n", response.ReasonPhrase);
             }
         }
     }
