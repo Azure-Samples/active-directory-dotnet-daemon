@@ -78,8 +78,11 @@ NOTE:  Steps 13 and 14 are not necessary for this sample, but are included in ca
 4. Click the Applications tab.
 5. In the drawer, click Add.
 6. Click "Add an application my organization is developing".
-
-Coming soon.
+7. Enter a friendly name for the application, for example "TodoListDaemon", select "Web Application and/or Web API", and click next.
+8. Since this application is a daemon and not a web application, it doesn't have a sign-in URL or app ID URI.  For these two fields, enter "http://TodoListDaemon".
+9. While still in the Azure portal, click the Configure tab of your application.
+10. Find the Client ID value and copy it aside, you will need this later when configuring your application.
+11. Create a new key for the application.  Save the configuration so you can view the key value.  Save this aside for when you configure the project in Visual Studio.
 
 ### Step 4:  Configure the sample to use your Azure AD tenant
 
@@ -93,7 +96,11 @@ Coming soon.
 
 #### Configure the TodoListDaemon project
 
-Coming soon.
+1. Open `Program.cs'.
+2. Find the declaration of `tenant` and replace the value with the name of your Azure AD tenant.
+3. Find the declaration of `clientId` and replace the value with the Client ID from the Azure portal.
+4. Find the declaration of `appKey` and replace the value with the Key from the Azure portal.
+5. Find the declaration of `todoListResourceId` and `todoListBaseAddress` and ensure their values are set properly for your TodoListService project.
 
 ### Step 5:  Trust the IIS Express SSL certificate
 
@@ -103,7 +110,7 @@ Coming soon.
 
 ### Step 6:  Run the sample
 
-You know what to do!  Explore the sample by signing in, adding items to the To Do list, removing the user account, and starting again.  Notice that if you stop the application without removing the user account, the next time you run the application you won't be prompted to sign-in again - that is the sample implements a persistent cache for ADAL, and remembers the tokens from the previous run.
+You know what to do!  The daemon will add items to its To Do list and then read them back.
 
 ## How To Deploy This Sample to Azure
 
@@ -127,8 +134,10 @@ First, in Visual Studio 2013 create an empty solution to host the  projects.  Th
 
 ### Creating the TodoListDaemon Project
 
-1. In the solution, create a new Windows 
-
-Coming soon.
+1. In the solution, create a new Windows --> Console Application called TodoListDaemon.
+2. Add the (stable) Active Directory Authentication Library (ADAL) NuGet, Microsoft.IdentityModel.Clients.ActiveDirectory, version 1.0.3 (or higher) to the project.
+3. Add  assembly references to `System.Net.Http` and `System.Web.Extensions`.
+4. Add a new class to the project called `TodoItem.cs`.  Copy the code from the sample project file of same name into this class, completely replacing the code in the file in the new project.
+5. Copy the code from `Program.cs` in the sample project into the file of same name in the new project, completely replacing the code in the file in the new project.
 
 Finally, in the properties of the solution itself, set both projects as startup projects.
