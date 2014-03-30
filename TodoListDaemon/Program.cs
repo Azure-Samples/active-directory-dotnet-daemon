@@ -37,14 +37,18 @@ namespace TodoListDaemon
         const string todoListBaseAddress = "https://localhost:44321";
 
         private static HttpClient httpClient = new HttpClient();
-        private static AuthenticationContext authContext = new AuthenticationContext(authority);
-        private static ClientCredential clientCredential = new ClientCredential(clientId, appKey);
+        private static AuthenticationContext authContext = null;
+        private static ClientCredential clientCredential = null;
 
         static void Main(string[] args)
         {
             //
-            // Call the To Do service 10 times with a 6 second delay between calls.
+            // Call the To Do service 10 times with short delay between calls.
             //
+
+            authContext = new AuthenticationContext(authority);
+            clientCredential = new ClientCredential(clientId, appKey);
+
             for (int i = 0; i < 10; i++)
             {
                 Thread.Sleep(3000);
