@@ -105,9 +105,39 @@ NOTE:  Steps 13 and 14 are not necessary for this sample, but are included in ca
 
 ### Step 5:  Trust the IIS Express SSL certificate
 
-Since the web API is SSL protected, the client of the API (the web app) will refuse the SSL connection to the web API unless it trusts the API's SSL certificate.
+Since the web API is SSL protected, the client of the API (the web app) will refuse the SSL connection to the web API unless it trusts the API's SSL certificate.  Use the following steps in Windows Powershell to trust the IIS Express SSL certificate.  You only need to do this once.  If you fail to do this step, calls to the TodoListService will always throw an unhandled exception where the inner exception message is:
 
-Coming soon.
+"The underlying connection was closed: Could not establish trust relationship for the SSL/TLS secure channel."
+
+To configure your computer to trust the IIS Express SSL certificate, begin by opening a Windows Powershell command window as Administrator.
+
+Query your personal certificate store to find the thumbprint of the certificate for `CN=localhost`:
+
+```
+PS C:\windows\system32> dir Cert:\LocalMachine\My
+
+
+    Directory: Microsoft.PowerShell.Security\Certificate::LocalMachine\My
+
+
+Thumbprint                                Subject
+----------                                -------
+C24798908DA71693C1053F42A462327543B38042  CN=localhost
+```
+
+Next, add the certificate to the Trusted Root store:
+
+```
+PS C:\windows\system32> $cert = (get-item cert:\LocalMachine\My\C24798908DA71693C1053F42A462327543B38042)
+PS C:\windows\system32> $store = (get-item cert:\Localmachine\Root)
+PS C:\windows\system32> $store.Open("ReadWrite")
+PS C:\windows\system32> $store.Add($cert)
+PS C:\windows\system32> $store.Close()
+```
+
+You can verify the certificate is in the Trusted Root store by running this command:
+
+`PS C:\windows\system32> dir Cert:\LocalMachine\Root`
 
 ### Step 6:  Run the sample
 
