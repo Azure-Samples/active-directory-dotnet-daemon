@@ -141,7 +141,9 @@ You can verify the certificate is in the Trusted Root store by running this comm
 
 ### Step 6:  Run the sample
 
-You know what to do!  The daemon will add items to its To Do list and then read them back.
+Clean the solution, rebuild the solution, and run it.  You might want to go into the solution properties and set both projects as startup projects, with the service project starting first.
+
+The daemon will add items to its To Do list and then read them back.
 
 ## How To Deploy This Sample to Azure
 
