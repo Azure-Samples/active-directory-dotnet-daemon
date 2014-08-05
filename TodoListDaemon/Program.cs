@@ -94,7 +94,7 @@ namespace TodoListDaemon
                     // ADAL includes an in memory cache, so this call will only send a message to the server if the cached token is expired.
                     result = authContext.AcquireToken(todoListResourceId, clientCredential);
                 }
-                catch (ActiveDirectoryAuthenticationException ex)
+                catch (AdalException ex)
                 {
                     if (ex.ErrorCode == "temporarily_unavailable")
                     {
@@ -160,7 +160,7 @@ namespace TodoListDaemon
                     // ADAL includes an in memory cache, so this call will only send a message to the server if the cached token is expired.
                     result = authContext.AcquireToken(todoListResourceId, clientCredential);
                 }
-                catch (ActiveDirectoryAuthenticationException ex)
+                catch (AdalException ex)
                 {
                     if (ex.ErrorCode == "temporarily_unavailable")
                     {
