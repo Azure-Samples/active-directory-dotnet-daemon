@@ -48,25 +48,18 @@ There are two projects in this sample.  Each needs to be separately registered i
 NOTE:  Steps 13 and 14 are not necessary for this sample, but are included in case you want to compose this sample with client applications from other samples.
 
 ```JSON
-"appPermissions": [
+"oauth2Permissions": [
 {
-	"claimValue": "user_impersonation",
-	"description": "Allow full access to the To Do List service on behalf of the signed-in user",
-	"directAccessGrantTypes": [],
-	"displayName": "Have full access to the To Do List service",
-	"impersonationAccessGrantTypes": [
-		{
-			"impersonated": "User",
-		    "impersonator": "Application"
-		}
-	],
-	"isDisabled": false,
-	"origin": "Application",
-	"permissionId": "b69ee3c9-c40d-4f2a-ac80-961cd1534e40",
-	"resourceScopeType": "Personal",
-	"userConsentDescription": "Allow full access to the To Do service on your behalf",
-	"userConsentDisplayName": "Have full access to the To Do service"
-	}
+	"adminConsentDescription": "Allow full access to the To Do List service on behalf of the signed-in user",
+     	"adminConsentDisplayName": "Have full access to the To Do List service",
+     	"id": "b69ee3c9-c40d-4f2a-ac80-961cd1534e40",
+     	"isEnabled": true,
+     	"origin": "Application",
+     	"type": "User",
+     	"userConsentDescription": "Allow full access to the To Do service on your behalf",
+     	"userConsentDisplayName": "Have full access to the To Do service",
+     	"value": "user_impersonation"
+}
 ],
 ```
 
