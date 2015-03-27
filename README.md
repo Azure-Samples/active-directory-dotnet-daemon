@@ -70,8 +70,8 @@ There are two projects in this sample.  Each needs to be separately registered i
 
 1. Open `app.config'.
 2. Find the app key `ida:Tenant` and replace the value with your AAD tenant name.
-3. Find the app key `ida:ClientId` and replace the value with the Client ID for the TodoListClient from the Azure portal.
-4. Find the app key `ida:AppKey` and replace the value with the key for the TodoListClient from the Azure portal.
+3. Find the app key `ida:ClientId` and replace the value with the Client ID for the TodoListDaemon from the Azure portal.
+4. Find the app key `ida:AppKey` and replace the value with the key for the TodoListDaemon from the Azure portal.
 5. Find the app key `todo:TodoListResourceId` and replace the value with the  App ID URI of the TodoListService, for example `https://<your_tenant_name>/TodoListService`
 6. Find the app key `todo:TodoListBaseAddress` and replace the value with the base address of the TodoListService project.
 
