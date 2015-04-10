@@ -33,6 +33,7 @@ namespace TodoListDaemon
 {
     class Program
     {
+
         //
         // The Client ID is used by the application to uniquely identify itself to Azure AD.
         // The App Key is a credential used by the application to authenticate to Azure AD.
