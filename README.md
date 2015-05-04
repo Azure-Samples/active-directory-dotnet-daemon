@@ -53,6 +53,7 @@ There are two projects in this sample.  Each needs to be separately registered i
 9. While still in the Azure portal, click the Configure tab of your application.
 10. Find the Client ID value and copy it aside, you will need this later when configuring your application.
 11. Create a new key for the application.  Save the configuration so you can view the key value.  Save this aside for when you configure the project in Visual Studio.
+12. In "Permissions to Other Applications", click "Add Application." Select "Other" in the "Show" dropdown, and click the upper check mark. Locate & click on the TodoListService, and click the bottom check mark to add the application. Select "Access TodoListService" from the "Delegated Permissions" dropdown, and save the configuration.
 
 ### Step 4:  Configure the sample to use your Azure AD tenant
 
