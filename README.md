@@ -48,7 +48,7 @@ There are two projects in this sample.  Each needs to be separately registered i
 4. Click the Applications tab.
 5. In the drawer, click Add.
 6. Click "Add an application my organization is developing".
-7. Enter a friendly name for the application, for example "TodoListDaemon", select "Web Application and/or Web API", and click next.
+7. Enter a friendly name for the application, for example "TodoListDaemon", select "Native Client Application", and click next.
 8. Since this application is a daemon and not a web application, it doesn't have a sign-in URL or app ID URI.  For these two fields, enter "http://TodoListDaemon".
 9. While still in the Azure portal, click the Configure tab of your application.
 10. Find the Client ID value and copy it aside, you will need this later when configuring your application.
