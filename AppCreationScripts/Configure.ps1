@@ -7,26 +7,7 @@
  1) Run Powershell as an administrator
  2) in the PowerShell window, type: Install-Module AzureAD
 
- There are three ways to run this script
- Option1 (interactive)
- ---------------------
- Just run . .\Configue.ps1, and you will be prompted to sign-in (email address, password, and if needed MFA). 
- The script will be run as the signed-in user and will use the tenant in which the user is defined.
-
- Option 2 (Interactive, but create apps in a specified tenant)
- -------------------------------------------------------------
- If you want to create the apps in a specific tenant, before you run this script
- - In the Azure portal (https://portal.azure.com), choose your active directory tenant, then go to the Properties of the tenant and copy
-   the DirectoryID. This is what we'll use in this script for the tenant ID
- - run . .\Configue.ps1 -TenantId [place here the GUID representing the tenant ID]
-
- Option 2 (non-interactive)
- ---------------------------
- This supposes that you know the credentials of the user under which identity you want to create
- the applications. Here is an example of script you'd want to run in a PowerShell Window
-   $secpasswd = ConvertTo-SecureString "[Password here]" -AsPlainText -Force
-   $mycreds = New-Object System.Management.Automation.PSCredential ("[login@tenantName here]", $secpasswd)
-   . .\Configure.ps1 -Credential $mycreds
+ There are four ways to run this script. For more information, read the AppCreationScripts.md file in the same folder as this script.
 #>
 
 # Create a password that can be used as an application key
@@ -48,11 +29,11 @@ Function CreateAppKey([DateTime] $fromDate, [double] $durationInYears, [string]$
     $endDate = $fromDate.AddYears($durationInYears) 
     $keyId = (New-Guid).ToString();
     $key = New-Object Microsoft.Open.AzureAD.Model.PasswordCredential
-	$key.StartDate = $fromDate
-	$key.EndDate = $endDate
-	$key.Value = $pw
-	$key.KeyId = $keyId
-	return $key
+    $key.StartDate = $fromDate
+    $key.EndDate = $endDate
+    $key.Value = $pw
+    $key.KeyId = $keyId
+    return $key
 }
 
 # Adds the requiredAccesses (expressed as a pipe separated string) to the requiredAccess structure
@@ -81,15 +62,15 @@ Function AddResourcePermission($requiredAccess, `
 # See also: http://stackoverflow.com/questions/42164581/how-to-configure-a-new-azure-ad-application-through-powershell
 Function GetRequiredPermissions([string] $applicationDisplayName, [string] $requiredDelegatedPermissions, [string]$requiredApplicationPermissions, $servicePrincipal)
 {
-	# If we are passed the service principal we use it directly, otherwise we find it from the display name (which might not be unique)
-	if ($servicePrincipal)
-	{
-		$sp = $servicePrincipal
-	}
-	else
+    # If we are passed the service principal we use it directly, otherwise we find it from the display name (which might not be unique)
+    if ($servicePrincipal)
     {
-		$sp = Get-AzureADServicePrincipal -Filter "DisplayName eq '$applicationDisplayName'"
-	}
+        $sp = $servicePrincipal
+    }
+    else
+    {
+        $sp = Get-AzureADServicePrincipal -Filter "DisplayName eq '$applicationDisplayName'"
+    }
     $appid = $sp.AppId
     $requiredAccess = New-Object Microsoft.Open.AzureAD.Model.RequiredResourceAccess
     $requiredAccess.ResourceAppId = $appid 
@@ -217,14 +198,6 @@ Function ConfigureApplications
    Set-AzureADApplication -ObjectId $clientAadApplication.ObjectId -RequiredResourceAccess $requiredResourcesAccess
    Write-Host "Granted."
 
-    # Configure known client applications for service 
-	Write-Host "Configure known client applications for the 'service'"
-	$knowApplications = New-Object System.Collections.Generic.List[System.String]
-	$knowApplications.Add($clientAadApplication.AppId)
-    Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId -KnownClientApplications $knowApplications
-	Write-Host "Configured."
-
-
    # Update config file for 'service'
    $configFile = $pwd.Path + "\..\TodoListService\Web.Config"
    Write-Host "Updating the sample code ($configFile)"
@@ -239,7 +212,7 @@ Function ConfigureApplications
    ReplaceSetting -configFilePath $configFile -key "ida:AppKey" -newValue $clientAppKey
    ReplaceSetting -configFilePath $configFile -key "todo:TodoListResourceId" -newValue $serviceAadApplication.IdentifierUris
    ReplaceSetting -configFilePath $configFile -key "todo:TodoListBaseAddress" -newValue $serviceAadApplication.HomePage
-  Add-Content -Value "</tbody></table></body></html>" -Path createdApps.html
+   Add-Content -Value "</tbody></table></body></html>" -Path createdApps.html
 
   }
 }

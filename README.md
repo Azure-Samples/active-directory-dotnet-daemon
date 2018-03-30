@@ -31,7 +31,7 @@ Once the service started, when you start the `TodoListDaemon` desktop applicatio
 
 No user interaction is involved.
 
-> Picture
+![Overview](./ReadmeFiles/TodoListDaemon.png)
 
 ## How to run this sample
 
@@ -65,32 +65,35 @@ As a first step you'll need to:
 
 1. Sign in to the [Azure portal](https://portal.azure.com).
 1. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant where you wish to register your application.
-1. Click on **More Services** in the left-hand nav, and choose **Azure Active Directory**.
+1. Click on **All services** in the left-hand nav, and choose **Azure Active Directory**.
 
 #### Register the service app (TodoListService Web API)
 
-1. In the  **Azure Active Directory** pane, click on **App registrations** and choose **Add**.
-1. Enter a friendly name for the application, for example 'TodoListService' and select 'Web Application and/or Web API' as the *Application Type*.
+1. In the  **Azure Active Directory** pane, click on **App registrations** and choose **New application registration**.
+1. Enter a friendly name for the application, for example 'TodoListService' and select 'Web app / API' as the *Application Type*.
 1. For the *sign-on URL*, enter the base URL for the sample, which is by default `https://localhost:44321/`.
 1. Click on **Create** to create the application.
-1. While still in the Azure portal, choose your application, click on **Settings**, and choose **Properties**.
-1. Find the *Application ID* value and copy it to the clipboard. You'll need it to configure the Visual Studio configuration file for this project
-1. For the App ID URI, enter `https://<your_tenant_name>/TodoListService`, replacing `<your_tenant_name>` with the name of your Azure AD tenant.
+1. In the succeeding page, Find the *Application ID* value and copy it to the clipboard. You'll need it to configure the Visual Studio configuration file for this project.
+1. Then click on **Settings**, and choose **Properties**.
+1. For the App ID URI, replace the guid in the generated URI 'https://\<your_tenant_name\>/\<guid\>', with the name of your service. For example use: 'https://\<your_tenant_name\>/TodoListService' (replacing `<your_tenant_name>` with the name of your Azure AD tenant)
 
 #### Register the client app (TodoListDaemon)
 
-1. In the  **Azure Active Directory** pane, click on **App registrations** and choose **Add**.
-1. Enter a friendly name for the application, for example 'TodoListDaemon' and select 'Web Application and/or Web API' as the *Application Type*.
+1. In the  **Azure Active Directory** pane, click on **App registrations** and choose **New application registration**.
+1. Enter a friendly name for the application, for example 'TodoListDaemon' and select 'Web app / API' as the *Application Type*.
   > Even if this is a desktop application, this is a confidential client application hence the Application Type
 1. For the *Redirect URI*, enter `https://<your_tenant_name>/TodoListDaemon`, replacing `<your_tenant_name>` with the name of your Azure AD tenant.
 1. Click on **Create** to create the application.
-1. While still in the Azure portal, choose your application, click on **Settings**, and choose **Properties**.
-1. Find the *Application ID* value and copy it to the clipboard. You'll need it to configure the Visual Studio configuration file for this project
-1. For the App ID URI, enter `https://<your_tenant_name>/TodoListDaemon`, replacing `<your_tenant_name>` with the name of your Azure AD tenant.
-1. From the Settings menu, choose **Keys** and add a key. Type a key description (of instance `app secret`), select a key duration of either **In 1 year** or **In 2 years**.
-   When you save this page, the key value will be displayed, copy, and save the value in a safe location.
-   You'll need this key later to configure the project in Visual Studio. This key value will not be displayed again, nor retrievable by any other means,
-   so record it as soon as it is visible from the Azure portal.
+1. In the succeeding page, Find the *Application ID* value and copy it to the clipboard. You'll need it to configure the Visual Studio configuration file for this project.
+1. Then click on **Settings**, and choose **Properties**.
+1. For the App ID URI, replace the guid in the generated URI 'https://\<your_tenant_name\>/\<guid\>', with the name of your service. For example use: 'https://\<your_tenant_name\>/TodoListDaemon' (replacing `<your_tenant_name>` with the name of your Azure AD tenant)
+1. From the Settings menu, choose **Keys** and add a new entry in the Password section:
+
+   - Type a key description (of instance `app secret`),
+   - Select a key duration of either **In 1 year**, **In 2 years**, or **Never Expires**.
+   - When you save this page, the key value will be displayed, copy, and save the value in a safe location.
+   - You'll need this key later to configure the project in Visual Studio. This key value will not be displayed again, nor retrievable by any other means,
+     so record it as soon as it is visible from the Azure portal.
 1. Configure Permissions for your application. To that extent, in the Settings menu, choose the 'Required permissions' section and then,
    click on **Add**, then **Select an API**, and type `TodoListService` in the textbox. Then, click on  **Select Permissions** and select **Access 'TodoListService'**.
 
@@ -115,7 +118,7 @@ Open the solution in Visual Studio to configure the projects
 1. Find the app key `todo:TodoListResourceId` and replace the existing value with the App ID URI you registered earlier for the TodoListService app. For instance use `https://<your_tenant_name>/TodoListService`, where `<your_tenant_name>` is the name of your Azure AD tenant.
 1. Find the app key `todo:TodoListBaseAddress` and replace the existing value with the base address of the TodoListService project (by default `https://localhost:44321/`).
 
-**NOTE:** The TodoListService's `ida:Audience` and TodoListDaemon's `todo:TodoListResourceId` app key values must not only match the App ID URI you configured, but they must also match each other exactly. This includes case. Otherwise calls to the TodoListService /api/todolist endpoint will fail with "Error: unauthorized".
+**NOTE:** The TodoListService's `ida:Audience` and TodoListDaemon's `todo:TodoListResourceId` app key values must not only match the App ID URI you configured, but they must also match each other exactly. This mach includes casing. Otherwise calls to the TodoListService /api/todolist endpoint will fail with "Error: unauthorized".
 
 ### Step 4: Run the sample
 
@@ -160,13 +163,34 @@ Also, if you increase the instance count of the web site, requests will be distr
 
 ## About The Code
 
-> Describe:
-> - where the code uses auth libraries, or calls the graph
-> - specific aspects (cache)
+The code acquiring a token is entirely located in the `TodoListDaemon\Program.cs` file.
+The `Authentication` context is created line 68
+
+```CSharp
+authContext = new AuthenticationContext(authority);
+```
+
+Then a `ClientCredential` is instantiated line 69, from the TodoListDaemon application's Client ID and the application secret (`appKey`).
+
+```CSharp
+clientCredential = new ClientCredential(clientId, appKey);
+```
+
+This instance of `ClientCredential` is used in the `PostTodo()` and `GetTodo()` methods  as an argument to `AcquireTokenAsync` to get a token for the Web API (line 96 and 162)
+
+```CSharp
+result = await authContext.AcquireTokenAsync(todoListResourceId, clientCredential);
+```
+
+This token is then used as a bearer token to call the Web API (line 127 and 193)
+
+```CSharp
+httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken)
+```
 
 ## How to recreate this sample
 
-First, in Visual Studio 2013 create an empty solution to host the  projects.  Then, follow these steps to create each project.
+First, in Visual Studio create an empty solution to host the  projects.  Then, follow the following steps to create each project.
 
 ### Creating the TodoListService Project
 
@@ -194,6 +218,22 @@ First, in Visual Studio 2013 create an empty solution to host the  projects.  Th
 6. In `app.config` create keys for `ida:AADInstance`, `ida:Tenant`, `ida:ClientId`, `ida:AppKey`, `todo:TodoListResourceId`, and `todo:TodoListBaseAddress` and set them accordingly.  For the global Azure cloud, the value of `ida:AADInstance` is `https://login.windows.net/{0}`.
 
 Finally, in the properties of the solution itself, set both projects as startup projects.
+
+## Community Help and Support
+
+Use [Stack Overflow](http://stackoverflow.com/questions/tagged/adal) to get support from the community.
+Ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before.
+Make sure that your questions or comments are tagged with [`adal` `dotnet`].
+
+If you find and bug in the sample, please raise the issue on [GitHub Issues](../../issues).
+
+To provide a recommendation, visit the following [User Voice page](https://feedback.azure.com/forums/169401-azure-active-directory).
+
+## Contributing
+
+If you'd like to contribute to this sample, see [CONTRIBUTING.MD](/CONTRIBUTING.md).
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 ## More information
 
