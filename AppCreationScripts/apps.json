@@ -20,7 +20,7 @@
       "Id": "client",
       "Name": "TodoListDaemon",
       "PasswordCredentials": "Auto",
-      "IsPublicClient": true,
+      "IsPublicClient": false,
       "RequiredResourcesAccess": [
         {
           "Resource": "service",

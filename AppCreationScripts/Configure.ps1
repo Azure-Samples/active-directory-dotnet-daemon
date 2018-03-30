@@ -197,9 +197,9 @@ Function ConfigureApplications
    $key = CreateAppKey -fromDate $fromDate -durationInYears 2 -pw $pw
    $clientAppKey = $pw
    $clientAadApplication = New-AzureADApplication -DisplayName "TodoListDaemon" `
-                                                  -ReplyUrls "https://TodoListDaemon" `
+                                                  -IdentifierUris "https://$tenantName/TodoListDaemon" `
                                                   -PasswordCredentials $key `
-                                                  -PublicClient $True
+                                                  -PublicClient $False
    $currentAppId = $clientAadApplication.AppId
    $clientServicePrincipal = New-AzureADServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
    Write-Host "Done."

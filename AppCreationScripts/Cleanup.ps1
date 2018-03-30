@@ -57,7 +57,7 @@ This function removes the Azure AD applications for the sample. These applicatio
     }
 
     Write-Host "Removing 'client' (TodoListDaemon) if needed"
-    $app=Get-AzureADApplication -Filter "DisplayName eq 'TodoListDaemon'"  
+    $app=Get-AzureADApplication -Filter "identifierUris/any(uri:uri eq 'https://$tenantName/TodoListDaemon')"  
     if ($app)
     {
         Remove-AzureADApplication -ObjectId $app.ObjectId
