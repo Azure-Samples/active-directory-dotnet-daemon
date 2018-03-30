@@ -20,13 +20,13 @@ This sample demonstrates a Desktop daemon application calling a ASP.NET Web API 
 1. The .Net `TodoListDaemon` application uses the Active Directory Authentication Library (ADAL) to obtain a JWT access token from Azure Active Directory (Azure AD). The token is requested using the OAuth 2.0 [Client Credentials flow](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Client-credential-flows), where the client credential is a password. You could also use a certificate to prove the identity of the app. Client credential with certificate is the object of another sample: [active-directory-dotnet-daemon-certificate-credential](https://github.com/Azure-Samples/active-directory-dotnet-daemon-certificate-credential) sample.
 2. The access token is used as a bearer token to authenticate the user when calling the `TodoListService` ASP.NET Web API.
 
-![Overview](./ReadmeFiles/topology.png)
+![Overview](./ReadmeFiles/Topology.png)
 
 ### Scenario
 
 Once the service started, when you start the `TodoListDaemon` desktop application, it repeatedly:
 
-- adds items to the todo list maintained by the service, 
+- adds items to the todo list maintained by the service,
 - lists the existing items.
 
 No user interaction is involved.
