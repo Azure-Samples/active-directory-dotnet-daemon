@@ -9,26 +9,29 @@ endpoint: AAD V1
 ---
 # Calling a Web API in a daemon app or long-running process
 
-![Build badge](https://identitydivision.visualstudio.com/_apis/public/build/definitions/a7934fdd-dcde-4492-a406-7fad6ac00e17/<BuildNumber>/badge)
+![Build badge](https://identitydivision.visualstudio.com/_apis/public/build/definitions/a7934fdd-dcde-4492-a406-7fad6ac00e17/21/badge)
 
 ## About this sample
 
 ### Overview
 
-This sample demonstrates a Desktop application calling a ASP.NET Web API that is secured using Azure Active Directory.
+This sample demonstrates a Desktop daemon application calling a ASP.NET Web API that is secured using Azure Active Directory. This scenario is useful for situations where a headless, or unattended job, or process, needs to run as an application identity, instead of as a user's identity.
 
-1. The .Net TodoListClient Desktop application uses the Active Directory Authentication Library (ADAL) to obtain a JWT access token from Azure Active Directory (Azure AD):
-2. The access token is used as a bearer token to authenticate the user when calling the ASP.NET Web API.
+1. The .Net `TodoListDaemon` application uses the Active Directory Authentication Library (ADAL) to obtain a JWT access token from Azure Active Directory (Azure AD). The token is requested using the OAuth 2.0 [Client Credentials flow](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Client-credential-flows), where the client credential is a password. You could also use a certificate to prove the identity of the app. Client credential with certificate is the object of another sample: [active-directory-dotnet-daemon-certificate-credential](https://github.com/Azure-Samples/active-directory-dotnet-daemon-certificate-credential) sample.
+2. The access token is used as a bearer token to authenticate the user when calling the `TodoListService` ASP.NET Web API.
 
 ![Overview](./ReadmeFiles/topology.png)
 
 ### Scenario
 
-The daemon will add items to its To Do list and then read them back.
-> Describe the scenario
-> Insert a screen copy of the client
+Once the service started, when you start the `TodoListDaemon` desktop application, it repeatedly:
 
-> Looking for previous versions of this code sample? Check out the tags on the [releases](../../releases) GitHub page.
+- adds items to the todo list maintained by the service, 
+- lists the existing items.
+
+No user interaction is involved.
+
+> Picture
 
 ## How to run this sample
 
@@ -112,13 +115,13 @@ Open the solution in Visual Studio to configure the projects
 1. Find the app key `todo:TodoListResourceId` and replace the existing value with the App ID URI you registered earlier for the TodoListService app. For instance use `https://<your_tenant_name>/TodoListService`, where `<your_tenant_name>` is the name of your Azure AD tenant.
 1. Find the app key `todo:TodoListBaseAddress` and replace the existing value with the base address of the TodoListService project (by default `https://localhost:44321/`).
 
-**NOTE:** The TodoListService's `ida:Audience` and TodoListDaemon's `todo:TodoListResourceId` app key values must not only match the App ID URI you configured, but they must also match each other exactly, including case. Otherwise calls to the TodoListService /api/todolist endpoint will fail with "Error: unauthorized".
+**NOTE:** The TodoListService's `ida:Audience` and TodoListDaemon's `todo:TodoListResourceId` app key values must not only match the App ID URI you configured, but they must also match each other exactly. This includes case. Otherwise calls to the TodoListService /api/todolist endpoint will fail with "Error: unauthorized".
 
 ### Step 4: Run the sample
 
 Clean the solution, rebuild the solution, and run it.  You might want to go into the solution properties and set both projects as startup projects, with the service project starting first.
 
-> Explain how to Explore the sample.
+See the scenario section above to understand how to run the sample
 
 ## How to deploy this sample to Azure
 
@@ -161,14 +164,22 @@ Also, if you increase the instance count of the web site, requests will be distr
 > - where the code uses auth libraries, or calls the graph
 > - specific aspects (cache)
 
-## How To Recreate This Sample
+## How to recreate this sample
 
 First, in Visual Studio 2013 create an empty solution to host the  projects.  Then, follow these steps to create each project.
 
 ### Creating the TodoListService Project
 
-1. In the solution, create a new ASP.Net MVC web API project called TodoListService and while creating the project, click the Change Authentication button, select Organizational Accounts, Cloud - Single Organization, enter the name of your Azure AD tenant, and set the Access Level to Single Sign On.  You will be prompted to sign-in to your Azure AD tenant.  NOTE:  You must sign-in with a user that is in the tenant; you cannot, during this step, sign-in with a Microsoft account.
-2. In the `Models` folder add a new class called `TodoItem.cs`.  Copy the implementation of TodoItem from this sample into the class.
+1. In the solution, create a new ASP.Net MVC web API project called `TodoListService` and while creating the project:
+
+   - Click the **Change Authentication** button,
+   - Select **Organizational Accounts, Cloud - Single Organization**,
+   - Enter the name of your Azure AD tenant,
+   - and set the Access Level to **Single Sign On**. You will be prompted to sign in to your Azure AD tenant.
+
+     > NOTE:  You must sign in with a user that is in the tenant; you cannot, during this step, sign in with a Microsoft account.
+
+2. In the  folder, add a new class called `TodoItem.cs`.  Copy the implementation of TodoItem from this sample into the class.
 3. Add a new, empty, Web API 2 controller called `TodoListController`.
 4. Copy the implementation of the TodoListController from this sample into the controller.  Don't forget to add the `[Authorize]` attribute to the class.
 5. In `TodoListController` resolving missing references by adding `using` statements for `System.Collections.Concurrent`, `TodoListService.Models`, `System.Security.Claims`.
@@ -178,9 +189,9 @@ First, in Visual Studio 2013 create an empty solution to host the  projects.  Th
 1. In the solution, create a new Windows --> Console Application called TodoListDaemon.
 2. Add the (stable) Active Directory Authentication Library (ADAL) NuGet, Microsoft.IdentityModel.Clients.ActiveDirectory, version 1.0.3 (or higher) to the project.
 3. Add  assembly references to `System.Net.Http`, `System.Web.Extensions`, and `System.Configuration`.
-4. Add a new class to the project called `TodoItem.cs`.  Copy the code from the sample project file of same name into this class, completely replacing the code in the file in the new project.
-5. Copy the code from `Program.cs` in the sample project into the file of same name in the new project, completely replacing the code in the file in the new project.
-6. In `app.config` create keys for `ida:AADInstance`, `ida:Tenant`, `ida:ClientId`, `ida:AppKey`, `todo:TodoListResourceId`, and `todo:TodoListBaseAddress` and set them accordingly.  For the public Azure cloud, the value of `ida:AADInstance` is `https://login.windows.net/{0}`.
+4. Add a new class to the project called `TodoItem.cs`.  Copy the code from the sample project file of the same name into this class, completely replacing the code in the new file.
+5. Copy the code from `Program.cs` in the sample project into the file of the same name in the new project, completely replacing the code in the new file.
+6. In `app.config` create keys for `ida:AADInstance`, `ida:Tenant`, `ida:ClientId`, `ida:AppKey`, `todo:TodoListResourceId`, and `todo:TodoListBaseAddress` and set them accordingly.  For the global Azure cloud, the value of `ida:AADInstance` is `https://login.windows.net/{0}`.
 
 Finally, in the properties of the solution itself, set both projects as startup projects.
 
@@ -188,7 +199,7 @@ Finally, in the properties of the solution itself, set both projects as startup 
 
 For more information, see ADAL.NET's conceptual documentation:
 
-- [Using the acquired token to call a protected Web API](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Using-the-acquired-token-to-call-a-protected-Web-API)
 - [Client credential flows](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Client-credential-flows)
+- [Using the acquired token to call a protected Web API](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Using-the-acquired-token-to-call-a-protected-Web-API)
 
 For more information about how OAuth 2.0 protocols work in this scenario and other scenarios, see [Authentication Scenarios for Azure AD](http://go.microsoft.com/fwlink/?LinkId=394414).
