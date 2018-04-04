@@ -1,0 +1,84 @@
+{
+  "Sample": {
+    "Title": "Calling a Web API in a daemon app or long-running process",
+    "Level": 200,
+    "Client": "Desktop",
+    "Service": "ASP.NET Web API"
+  },
+
+  /*
+    This section describes the Azure AD Applications to configure, and their dependencies
+  */
+  "AADApps": [
+    {
+      "Id": "service",
+      "Name": "TodoListService",
+      "IsPublicClient": false,
+      "HomePage": "https://localhost:44321/"
+    },
+    {
+      "Id": "client",
+      "Name": "TodoListDaemon",
+      "PasswordCredentials": "Auto",
+      "IsPublicClient": false,
+      "RequiredResourcesAccess": [
+        {
+          "Resource": "service",
+          "DelegatedPermissions": [ "user_impersonation" ]
+        }
+      ]
+    }
+  ],
+
+  /*
+    This section describes how to update the code in configuration files from the apps coordinates, once the apps
+    are created in Azure AD.
+    Each section describes a configuration file, for one of the apps, it's type (XML, JSon, plain text), its location
+    with respect to the root of the sample, and the mappping (which string in the config file is mapped to which value
+  */
+  "CodeConfiguration": [
+    {
+      "App": "service",
+      "SettingKind": "XML",
+      "SettingFile": "\\..\\TodoListService\\Web.Config",
+      "Mappings": [
+        {
+          "key": "ida:Tenant",
+          "value": "$tenantName"
+        },
+        {
+          "key": "ida:Audience",
+          "value": "service.IdentifierUris"
+        }
+      ]
+    },
+
+    {
+      "App": "client",
+      "SettingKind": "XML",
+      "SettingFile": "\\..\\TodoListDaemon\\App.Config",
+      "Mappings": [
+        {
+          "key": "ida:Tenant",
+          "value": "$tenantName"
+        },
+        {
+          "key": "ida:ClientId",
+          "value": ".AppId"
+        },
+        {
+          "key": "ida:AppKey",
+          "value": ".AppKey"
+        },
+        {
+          "key": "todo:TodoListResourceId",
+          "value": "service.IdentifierUris"
+        },
+        {
+          "key": "todo:TodoListBaseAddress",
+          "value": "service.HomePage"
+        }
+      ]
+    }
+  ]
+}
