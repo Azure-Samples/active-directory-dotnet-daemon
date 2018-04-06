@@ -57,7 +57,7 @@ There are two projects in this sample. Each needs to be separately registered in
   - **automatically** create for you the Azure AD applications and related objects (passwords, permissions, dependencies)
   - modify the Visual Studio projects' configuration files.
 
-If you want to do use this automation, read the instructions in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md)
+If you want to use this automation, read the instructions in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md)
 
 #### First step: choose the Azure AD tenant where you want to create your applications
 
@@ -163,14 +163,14 @@ Also, if you increase the instance count of the web site, requests will be distr
 
 ## About The Code
 
-The code acquiring a token is entirely located in the `TodoListDaemon\Program.cs` file.
-The `Authentication` context is created line 68
+The code acquiring a token is located entirely in the `TodoListDaemon\Program.cs` file.
+The `Authentication` context is created (line 68)
 
 ```CSharp
 authContext = new AuthenticationContext(authority);
 ```
 
-Then a `ClientCredential` is instantiated line 69, from the TodoListDaemon application's Client ID and the application secret (`appKey`).
+Then a `ClientCredential` is instantiated (line 69), from the TodoListDaemon application's Client ID and the application secret (`appKey`).
 
 ```CSharp
 clientCredential = new ClientCredential(clientId, appKey);
@@ -225,7 +225,7 @@ Use [Stack Overflow](http://stackoverflow.com/questions/tagged/adal) to get supp
 Ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before.
 Make sure that your questions or comments are tagged with [`adal` `dotnet`].
 
-If you find and bug in the sample, please raise the issue on [GitHub Issues](../../issues).
+If you find a bug in the sample, please raise the issue on [GitHub Issues](../../issues).
 
 To provide a recommendation, visit the following [User Voice page](https://feedback.azure.com/forums/169401-azure-active-directory).
 
