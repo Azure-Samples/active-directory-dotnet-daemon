@@ -162,6 +162,8 @@ Function ConfigureApplications
                                                    -HomePage "https://localhost:44321/" `
                                                    -IdentifierUris "https://$tenantName/TodoListService" `
                                                    -PublicClient $False
+
+
    $currentAppId = $serviceAadApplication.AppId
    $serviceServicePrincipal = New-AzureADServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
    Write-Host "Done."
@@ -181,6 +183,8 @@ Function ConfigureApplications
                                                   -IdentifierUris "https://$tenantName/TodoListDaemon" `
                                                   -PasswordCredentials $key `
                                                   -PublicClient $False
+
+
    $currentAppId = $clientAadApplication.AppId
    $clientServicePrincipal = New-AzureADServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
    Write-Host "Done."
@@ -189,9 +193,9 @@ Function ConfigureApplications
    $clientPortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_IAM/ApplicationBlade/appId/"+$clientAadApplication.AppId+"/objectId/"+$clientAadApplication.ObjectId
    Add-Content -Value "<tr><td>client</td><td>$currentAppId</td><td><a href='$clientPortalUrl'>TodoListDaemon</a></td></tr>" -Path createdApps.html
 
+   $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
    # Add Required Resources Access (from 'client' to 'service')
    Write-Host "Getting access from 'client' to 'service'"
-   $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
    $requiredPermissions = GetRequiredPermissions -applicationDisplayName "TodoListService" `
                                                  -requiredDelegatedPermissions "user_impersonation";
    $requiredResourcesAccess.Add($requiredPermissions)

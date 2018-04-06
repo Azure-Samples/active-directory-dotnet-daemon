@@ -48,6 +48,8 @@ From your shell or command line:
 
 `git clone https://github.com/Azure-Samples/active-directory-dotnet-daemon.git`
 
+> Given that the name of the sample is pretty long, and so are the name of the referenced NuGet pacakges, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
+
 ### Step 2:  Register the sample with your Azure Active Directory tenant
 
 There are two projects in this sample. Each needs to be separately registered in your Azure AD tenant. To register these projects, you can:
@@ -75,7 +77,7 @@ As a first step you'll need to:
 1. Click on **Create** to create the application.
 1. In the succeeding page, Find the *Application ID* value and copy it to the clipboard. You'll need it to configure the Visual Studio configuration file for this project.
 1. Then click on **Settings**, and choose **Properties**.
-1. For the App ID URI, replace the guid in the generated URI 'https://\<your_tenant_name\>/\<guid\>', with the name of your service. For example use: 'https://\<your_tenant_name\>/TodoListService' (replacing `<your_tenant_name>` with the name of your Azure AD tenant)
+1. For the App ID URI, replace the guid in the generated URI 'https://\<your_tenant_name\>/\<guid\>', with the name of your service, for example, 'https://\<your_tenant_name\>/TodoListService' (replacing `<your_tenant_name>` with the name of your Azure AD tenant)
 
 #### Register the client app (TodoListDaemon)
 
@@ -86,7 +88,7 @@ As a first step you'll need to:
 1. Click on **Create** to create the application.
 1. In the succeeding page, Find the *Application ID* value and copy it to the clipboard. You'll need it to configure the Visual Studio configuration file for this project.
 1. Then click on **Settings**, and choose **Properties**.
-1. For the App ID URI, replace the guid in the generated URI 'https://\<your_tenant_name\>/\<guid\>', with the name of your service. For example use: 'https://\<your_tenant_name\>/TodoListDaemon' (replacing `<your_tenant_name>` with the name of your Azure AD tenant)
+1. For the App ID URI, replace the guid in the generated URI 'https://\<your_tenant_name\>/\<guid\>', with the name of your service, for example, 'https://\<your_tenant_name\>/TodoListDaemon' (replacing `<your_tenant_name>` with the name of your Azure AD tenant)
 1. From the Settings menu, choose **Keys** and add a new entry in the Password section:
 
    - Type a key description (of instance `app secret`),
@@ -132,7 +134,7 @@ This project has one WebApp / Web API projects. To deploy them to Azure Web Site
 
 - create an Azure Web Site
 - publish the Web App / Web APIs to the web site, and
-- update it client(s) to call the web site instead of IIS Express.
+- update its client(s) to call the web site instead of IIS Express.
 
 ### Create and Publish the `TodoListService` to an Azure Web Site
 
