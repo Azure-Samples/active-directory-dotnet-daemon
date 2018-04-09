@@ -69,6 +69,9 @@ As a first step you'll need to:
 1. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant where you wish to register your application.
 1. Click on **All services** in the left-hand nav, and choose **Azure Active Directory**.
 
+> In the next steps, you might need the tenant name (or directory name) or the tenant ID (or directory ID). These are presented in the **Properties**
+  of the Azure Active Directory window respectively as *Name* and *Directory ID*
+
 #### Register the service app (TodoListService Web API)
 
 1. In the  **Azure Active Directory** pane, click on **App registrations** and choose **New application registration**.
@@ -83,7 +86,7 @@ As a first step you'll need to:
 
 1. In the  **Azure Active Directory** pane, click on **App registrations** and choose **New application registration**.
 1. Enter a friendly name for the application, for example 'TodoListDaemon' and select 'Web app / API' as the *Application Type*.
-  > Even if this is a desktop application, this is a confidential client application hence the Application Type
+   > Even if this is a desktop application, this is a confidential client application hence the Application Type
 1. For the *Redirect URI*, enter `https://<your_tenant_name>/TodoListDaemon`, replacing `<your_tenant_name>` with the name of your Azure AD tenant.
 1. Click on **Create** to create the application.
 1. In the succeeding page, Find the *Application ID* value and copy it to the clipboard. You'll need it to configure the Visual Studio configuration file for this project.
@@ -105,13 +108,13 @@ In the steps below, ClientID is the same as Application ID or AppId.
 
 Open the solution in Visual Studio to configure the projects
 
-### Configure the service project
+#### Configure the service project
 
 1. Open the `TodoListService\Web.Config` file
 1. Find the app key `ida:Tenant` and replace the existing value with your AAD tenant name.
 1. Find the app key `ida:Audience` and replace the existing value with the App ID URI you registered earlier for the TodoListService app. For instance use `https://<your_tenant_name>/TodoListService`, where `<your_tenant_name>` is the name of your Azure AD tenant.
 
-### Configure the client project
+#### Configure the client project
 
 1. Open the `TodoListDaemon\App.Config` file
 1. Find the app key `ida:Tenant` and replace the existing value with your AAD tenant name.
