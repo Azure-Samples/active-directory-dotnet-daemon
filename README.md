@@ -76,9 +76,9 @@ As a first step you'll need to:
 
 1. In the  **Azure Active Directory** pane, click on **App registrations** and choose **New application registration**.
 1. Enter a friendly name for the application, for example 'TodoListService' and select 'Web app / API' as the *Application Type*.
-1. For the *sign-on URL*, enter the base URL for the sample, which is by default `https://localhost:44321/`.
-1. Click on **Create** to create the application.
-1. In the succeeding page, Find the *Application ID* value and copy it to the clipboard. You'll need it to configure the Visual Studio configuration file for this project.
+1. For the *sign-on URL*, enter the base URL for the sample. By default, this sample uses `https://localhost:44321/`.
+1. Click **Create** to create the application.
+1. In the succeeding page, Find the *Application ID* value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
 1. Then click on **Settings**, and choose **Properties**.
 1. For the App ID URI, replace the guid in the generated URI 'https://\<your_tenant_name\>/\<guid\>', with the name of your service, for example, 'https://\<your_tenant_name\>/TodoListService' (replacing `<your_tenant_name>` with the name of your Azure AD tenant)
 
@@ -88,8 +88,8 @@ As a first step you'll need to:
 1. Enter a friendly name for the application, for example 'TodoListDaemon' and select 'Web app / API' as the *Application Type*.
    > Even if this is a desktop application, this is a confidential client application hence the Application Type
 1. For the *Redirect URI*, enter `https://<your_tenant_name>/TodoListDaemon`, replacing `<your_tenant_name>` with the name of your Azure AD tenant.
-1. Click on **Create** to create the application.
-1. In the succeeding page, Find the *Application ID* value and copy it to the clipboard. You'll need it to configure the Visual Studio configuration file for this project.
+1. Click **Create** to create the application.
+1. In the succeeding page, Find the *Application ID* value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
 1. Then click on **Settings**, and choose **Properties**.
 1. For the App ID URI, replace the guid in the generated URI 'https://\<your_tenant_name\>/\<guid\>', with the name of your service, for example, 'https://\<your_tenant_name\>/TodoListDaemon' (replacing `<your_tenant_name>` with the name of your Azure AD tenant)
 1. From the Settings menu, choose **Keys** and add a new entry in the Password section:
@@ -104,20 +104,20 @@ As a first step you'll need to:
 
 ### Step 3:  Configure the sample to use your Azure AD tenant
 
-In the steps below, ClientID is the same as Application ID or AppId.
+In the steps below, "ClientID" is the same as "Application ID" or "AppId".
 
 Open the solution in Visual Studio to configure the projects
 
 #### Configure the service project
 
 1. Open the `TodoListService\Web.Config` file
-1. Find the app key `ida:Tenant` and replace the existing value with your AAD tenant name.
+1. Find the app key `ida:Tenant` and replace the existing value with your Azure AD tenant name.
 1. Find the app key `ida:Audience` and replace the existing value with the App ID URI you registered earlier for the TodoListService app. For instance use `https://<your_tenant_name>/TodoListService`, where `<your_tenant_name>` is the name of your Azure AD tenant.
 
 #### Configure the client project
 
 1. Open the `TodoListDaemon\App.Config` file
-1. Find the app key `ida:Tenant` and replace the existing value with your AAD tenant name.
+1. Find the app key `ida:Tenant` and replace the existing value with your Azure AD tenant name.
 1. Find the app key `ida:ClientId` and replace the existing value with the application ID (clientId) of the `TodoListDaemon` application copied from the Azure portal.
 1. Find the app key `ida:AppKey` and replace the existing value with the key you saved during the creation of the `TodoListDaemon` app, in the Azure portal.
 1. Find the app key `todo:TodoListResourceId` and replace the existing value with the App ID URI you registered earlier for the TodoListService app. For instance use `https://<your_tenant_name>/TodoListService`, where `<your_tenant_name>` is the name of your Azure AD tenant.
@@ -142,11 +142,11 @@ This project has one WebApp / Web API projects. To deploy them to Azure Web Site
 ### Create and Publish the `TodoListService` to an Azure Web Site
 
 1. Sign in to the [Azure portal](https://portal.azure.com).
-2. Click New in the top left-hand corner, select Web + Mobile --> Web App, select the hosting plan and region, and give your web site a name, for example, `TodoListService-contoso.azurewebsites.net`.  Click Create Web Site.
-3. Once the web site is created, click on it to manage it.  For this set of steps, download the publish profile and save it.  Other deployment mechanisms, such as from source control, can also be used.
-4. Switch to Visual Studio and go to the TodoListService project.  Right click on the project in the Solution Explorer and select Publish.  Click Import, and import the publish profile that you downloaded.
-5. On the Connection tab, update the Destination URL so that it is https, for example [https://TodoListService-contoso.azurewebsites.net](https://TodoListService-contoso.azurewebsites.net). Click Next.
-6. On the Settings tab, make sure Enable Organizational Authentication is NOT selected.  Click Publish.
+2. Click **Create a resource** in the top left-hand corner, select **Web + Mobile** --> **Web App**, select the hosting plan and region, and give your web site a name, for example, `TodoListService-contoso.azurewebsites.net`.  Click Create Web Site.
+3. Once the web site is created, click on it to manage it.  For this set of steps, download the publish profile by clicking **Get publish profile** and save it.  Other deployment mechanisms, such as from source control, can also be used.
+4. Switch to Visual Studio and go to the TodoListService project.  Right click on the project in the Solution Explorer and select **Publish**.  Click **Import Profile** on the bottom bar, and import the publish profile that you downloaded earlier.
+5. Click on **Settings** and in the `Connection tab`, update the Destination URL so that it is https, for example [https://TodoListService-contoso.azurewebsites.net](https://TodoListService-contoso.azurewebsites.net). Click Next.
+6. On the Settings tab, make sure `Enable Organizational Authentication` is NOT selected.  Click **Save**. Click on **Publish** on the main screen.
 7. Visual Studio will publish the project and automatically open a browser to the URL of the project.  If you see the default web page of the project, the publication was successful.
 
 ### Update the Active Directory tenant application registration for `TodoListService`
@@ -154,7 +154,7 @@ This project has one WebApp / Web API projects. To deploy them to Azure Web Site
 1. Navigate to the [Azure portal](https://portal.azure.com).
 2. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant containing the `TodoListService` application.
 3. On the applications tab, select the `TodoListService` application.
-4. From the Settings -> Properties and Settings -> Reply URLs menus, update the Sign-On URL, and Reply URL fields to the address of your service, for example [https://TodoListService-contoso.azurewebsites.net](https://TodoListService-contoso.azurewebsites.net). Save the configuration.
+4. From the Settings -> Reply URLs menu, update the Sign-On URL, and Reply URL fields to the address of your service, for example [https://TodoListService-contoso.azurewebsites.net](https://TodoListService-contoso.azurewebsites.net). Save the configuration.
 
 ### Update the `TodoListDaemon` to call the `TodoListService` Running in Azure Web Sites
 
