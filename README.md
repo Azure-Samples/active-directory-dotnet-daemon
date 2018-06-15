@@ -88,7 +88,7 @@ of the Azure Active Directory window respectively as *Name* and *Directory ID*
 1. In the  **Azure Active Directory** pane, click on **App registrations** and choose **New application registration**.
 1. Enter a friendly name for the application, for example 'TodoListDaemon' and select 'Web app / API' as the *Application Type*.
    > Even if this is a desktop application, this is a confidential client application hence the Application Type being 'Web app / API', which is counter intuitive
-1. For the *Redirect URI*, enter `https://<your_tenant_name>/TodoListDaemon`, replacing `<your_tenant_name>` with the name of your Azure AD tenant.
+1. For the *Sign-on URL*, enter `https://<your_tenant_name>/TodoListDaemon`, replacing `<your_tenant_name>` with the name of your Azure AD tenant.
 1. Click **Create** to create the application.
 1. In the succeeding page, Find the *Application ID* value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
 1. Then click on **Settings**, and choose **Properties**.
