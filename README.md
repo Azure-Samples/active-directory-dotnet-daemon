@@ -81,7 +81,23 @@ of the Azure Active Directory window respectively as *Name* and *Directory ID*
 1. Click **Create** to create the application.
 1. In the succeeding page, Find the *Application ID* value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
 1. Then click on **Settings**, and choose **Properties**.
-1. For the App ID URI, replace the guid in the generated URI 'https://\<your_tenant_name\>/\<guid\>', with the name of your service, for example, 'https://\<your_tenant_name\>/TodoListService' (replacing `<your_tenant_name>` with the name of your Azure AD tenant)
+1. For the App ID URI, replace the guid in the generated URI 'https://\<your_tenant_name\>/\<guid\>', with the name of your service, for example, 'https://\<your_tenant_name\>/TodoListService' (replacing `<your_tenant_name>` with the name of your Azure AD tenant).
+1. Default value of "User assignment required" property is No for the newly created apps which allows any client app in the same tenant to validate against the service without assigning a permission explicitly. To prevent this, [set "User assignment required" property to Yes](https://github.com/MicrosoftDocs/azure-docs/blob/master/articles/active-directory/active-directory-applications-guiding-developers-requiring-user-assignment.md) and please create an application role in the service app manifest as below-
+```
+"appRoles": [
+    {
+      "allowedMemberTypes": [
+        "Application"
+      ],
+      "displayName": "TodoListAdmin",
+      "id": "<Guid>",
+      "isEnabled": true,
+      "description": "Administrators can manage the todo list in their tenant",
+      "value": "TodoListAdmin"
+    }
+  ]
+  ```
+Please replace `<Guid>` in the above manifest with a unique GUID in the following format 00000000-0000-0000-0000-000000000000 and save the manifest. We are creating an **Application** type role here for the daemon service.
 
 #### Register the client app (TodoListDaemon)
 
@@ -101,7 +117,8 @@ of the Azure Active Directory window respectively as *Name* and *Directory ID*
    - You'll need this key later to configure the project in Visual Studio. This key value will not be displayed again, nor retrievable by any other means,
      so record it as soon as it is visible from the Azure portal.
 1. Configure Permissions for your application. To that extent, in the Settings menu, choose the 'Required permissions' section and then,
-   click on **Add**, then **Select an API**, and type `TodoListService` in the textbox. Then, click on  **Select Permissions** and select **Access 'TodoListService'**.
+   click on **Add**, then **Select an API**, and type `TodoListService` in the textbox. Then, click on  **Select Permissions** and select **'TodoListAdmin'**. This will allow this client app to access the service app using TodoListAdmin role.
+1. At this stage permissions are assigned correctly but client app is a daemon service so it cannot accept the consent via UI to use the service app. To avoid this situation, please click on "Grant permissions" which will accept the consent for the app at the admin level.
 
 ### Step 3:  Configure the sample to use your Azure AD tenant
 
