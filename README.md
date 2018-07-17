@@ -84,23 +84,23 @@ of the Azure Active Directory window respectively as *Name* and *Directory ID*
 1. For the App ID URI, replace the guid in the generated URI 'https://\<your_tenant_name\>/\<guid\>', with the name of your service, for example, 'https://\<your_tenant_name\>/TodoListService' (replacing `<your_tenant_name>` with the name of your Azure AD tenant).
 1. [Optional]. The default value of "User assignment required" property is No for the newly created apps which allows any client app in the same tenant access the service, provided it adds a permission during the application registration. In case you want the Web API to restrict  access to only dameon apps having a certain role, you'd want to do the following: 
 
-- [set "User assignment required" property to Yes](https://github.com/MicrosoftDocs/azure-docs/blob/master/articles/active-directory/active-directory-applications-guiding-developers-requiring-user-assignment.md) and 
-- and create an application role in the service app manifest as below:
-```
-"appRoles": [
-    {
-      "allowedMemberTypes": [
-        "Application"
-      ],
-      "displayName": "TodoListAdmin",
-      "id": "<Guid>",
-      "isEnabled": true,
-      "description": "Administrators can manage the todo list in their tenant",
-      "value": "TodoListAdmin"
-    }
-  ]
-  ```
-- Replace `<Guid>` in the above manifest with a unique GUID in the following format 00000000-0000-0000-0000-000000000000 and save the manifest. We are creating an **Application** type role here for the daemon service.
+   - [set "User assignment required" property to Yes](https://github.com/MicrosoftDocs/azure-docs/blob/master/articles/active-directory/active-directory-applications-guiding-developers-requiring-user-assignment.md) and 
+   - and create an application role in the service app manifest as below:
+   ```
+   "appRoles": [
+       {
+         "allowedMemberTypes": [
+           "Application"
+         ],
+         "displayName": "TodoListAdmin",
+         "id": "<Guid>",
+         "isEnabled": true,
+         "description": "Administrators can manage the todo list in their tenant",
+         "value": "TodoListAdmin"
+       }
+     ]
+     ```
+   - Replace `<Guid>` in the above manifest with a unique GUID in the following format 00000000-0000-0000-0000-000000000000 and save the manifest. We are creating an **Application** type role here for the daemon service.
 
 #### Register the client app (TodoListDaemon)
 
