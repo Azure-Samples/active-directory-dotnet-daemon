@@ -160,7 +160,7 @@ This project has one WebApp / Web API projects. To deploy them to Azure Web Site
 - publish the Web App / Web APIs to the web site, and
 - update its client(s) to call the web site instead of IIS Express.
 
-### Create and Publish the `TodoListService` to an Azure Web Site
+### Create and publish the `TodoListService` to an Azure Web Site
 
 1. Sign in to the [Azure portal](https://portal.azure.com).
 2. Click **Create a resource** in the top left-hand corner, select **Web + Mobile** --> **Web App**, select the hosting plan and region, and give your web site a name, for example, `TodoListService-contoso.azurewebsites.net`.  Click Create Web Site.
@@ -173,9 +173,9 @@ This project has one WebApp / Web API projects. To deploy them to Azure Web Site
 ### Update the Active Directory tenant application registration for `TodoListService`
 
 1. Navigate to the [Azure portal](https://portal.azure.com).
-2. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant containing the `TodoListService` application.
-3. On the applications tab, select the `TodoListService` application.
-4. From the Settings -> Reply URLs menu, update the Sign-On URL, and Reply URL fields to the address of your service, for example [https://TodoListService-contoso.azurewebsites.net](https://TodoListService-contoso.azurewebsites.net). Save the configuration.
+1. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant containing the `TodoListService` application.
+1. On the applications tab, select the `TodoListService` application.
+1. From the Settings -> Reply URLs menu, update the Sign-On URL, and Reply URL fields to the address of your service, for example [https://TodoListService-contoso.azurewebsites.net](https://TodoListService-contoso.azurewebsites.net). Save the configuration.
 
 ### Update the `TodoListDaemon` to call the `TodoListService` Running in Azure Web Sites
 
