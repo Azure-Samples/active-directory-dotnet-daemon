@@ -3,6 +3,7 @@
     "Title": "Calling a Web API in a daemon app or long-running process",
     "Level": 200,
     "Client": "Desktop",
+    "RepositoryUrl": "active-directory-dotnet-daemon",
     "Service": "ASP.NET Web API"
   },
 
@@ -13,12 +14,15 @@
     {
       "Id": "service",
       "Name": "TodoListService",
+      "Kind": "WebApi",
       "IsPublicClient": false,
-      "HomePage": "https://localhost:44321/"
+      "HomePage": "https://localhost:44321/",
+      "ReplyUrls": "https://localhost:44321/"
     },
     {
       "Id": "client",
       "Name": "TodoListDaemon",
+      "Kind": "Daemon",
       "PasswordCredentials": "Auto",
       "IsPublicClient": false,
       "RequiredResourcesAccess": [

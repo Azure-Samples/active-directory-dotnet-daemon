@@ -1,4 +1,13 @@
-param([Parameter(Mandatory=$false)][PSCredential]$Credential=$null, [Parameter(Mandatory=$false)][string]$TenantId)
+[CmdletBinding()]
+param(    
+    [PSCredential] $Credential,
+    [Parameter(Mandatory=$False, HelpMessage='Tenant ID (This is a GUID which represents the "Directory ID" of the AzureAD tenant into which you want to create the apps')]
+    [string] $tenantId
+)
+
+if ((Get-Module -ListAvailable -Name "AzureAD") -eq $null) { 
+    Install-Module "AzureAD" -Scope CurrentUser 
+} 
 Import-Module AzureAD
 $ErrorActionPreference = 'Stop'
 
@@ -8,15 +17,7 @@ Function Cleanup
 .Description
 This function removes the Azure AD applications for the sample. These applications were created by the Configure.ps1 script
 #>
-   [CmdletBinding()]
-    param(
-        [Parameter(HelpMessage='Tenant ID (This is a GUID which represents the "Directory ID" of the AzureAD tenant into which you want to create the apps')]
-        [PSCredential] $Credential,
-        [string] $tenantId
-    )
 
-   process
-   {
     # $tenantId is the Active Directory Tenant. This is a GUID which represents the "Directory ID" of the AzureAD tenant 
     # into which you want to create the apps. Look it up in the Azure portal in the "Properties" of the Azure AD. 
 
@@ -49,7 +50,8 @@ This function removes the Azure AD applications for the sample. These applicatio
     Write-Host "Cleaning-up applications from tenant '$tenantName'"
 
     Write-Host "Removing 'service' (TodoListService) if needed"
-    $app=Get-AzureADApplication -Filter "identifierUris/any(uri:uri eq 'https://$tenantName/TodoListService')"  
+    $app=Get-AzureADApplication -Filter "DisplayName eq 'TodoListService'"  
+
     if ($app)
     {
         Remove-AzureADApplication -ObjectId $app.ObjectId
@@ -57,14 +59,14 @@ This function removes the Azure AD applications for the sample. These applicatio
     }
 
     Write-Host "Removing 'client' (TodoListDaemon) if needed"
-    $app=Get-AzureADApplication -Filter "identifierUris/any(uri:uri eq 'https://$tenantName/TodoListDaemon')"  
+    $app=Get-AzureADApplication -Filter "DisplayName eq 'TodoListDaemon'"  
+
     if ($app)
     {
         Remove-AzureADApplication -ObjectId $app.ObjectId
         Write-Host "Removed."
     }
 
-   }
 }
 
 Cleanup -Credential $Credential -tenantId $TenantId
