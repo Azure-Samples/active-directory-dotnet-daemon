@@ -13,7 +13,7 @@
   "AADApps": [
     {
       "Id": "service",
-      "Name": "TodoListService",
+      "Name": "TodoListService_daemon_v1",
       "Kind": "WebApi",
       "IsPublicClient": false,
       "HomePage": "https://localhost:44321/",
@@ -21,7 +21,7 @@
     },
     {
       "Id": "client",
-      "Name": "TodoListDaemon",
+      "Name": "TodoList_daemon_v1",
       "Kind": "Daemon",
       "PasswordCredentials": "Auto",
       "IsPublicClient": false,
@@ -52,7 +52,7 @@
         },
         {
           "key": "ida:Audience",
-          "value": "service.IdentifierUris"
+          "value": "$serviceIdentifierUri"
         }
       ]
     },
@@ -76,7 +76,7 @@
         },
         {
           "key": "todo:TodoListResourceId",
-          "value": "service.IdentifierUris"
+          "value": "$serviceIdentifierUri"
         },
         {
           "key": "todo:TodoListBaseAddress",
