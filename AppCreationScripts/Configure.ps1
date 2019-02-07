@@ -235,7 +235,7 @@ Function ConfigureApplications
    $configFile = $pwd.Path + "\..\TodoListService\Web.Config"
    Write-Host "Updating the sample code ($configFile)"
    ReplaceSetting -configFilePath $configFile -key "ida:Tenant" -newValue $tenantName
-   ReplaceSetting -configFilePath $configFile -key "ida:Audience" -newValue $serviceIdentifierUri
+   ReplaceSetting -configFilePath $configFile -key "ida:Audience" -newValue $clientAadApplication.IdentifierUris
 
    # Update config file for 'client'
    $configFile = $pwd.Path + "\..\TodoListDaemon\App.Config"
@@ -243,7 +243,7 @@ Function ConfigureApplications
    ReplaceSetting -configFilePath $configFile -key "ida:Tenant" -newValue $tenantName
    ReplaceSetting -configFilePath $configFile -key "ida:ClientId" -newValue $clientAadApplication.AppId
    ReplaceSetting -configFilePath $configFile -key "ida:AppKey" -newValue $clientAppKey
-   ReplaceSetting -configFilePath $configFile -key "todo:TodoListResourceId" -newValue $serviceIdentifierUri
+   ReplaceSetting -configFilePath $configFile -key "todo:TodoListResourceId" -newValue $clientAadApplication.IdentifierUris
    ReplaceSetting -configFilePath $configFile -key "todo:TodoListBaseAddress" -newValue $serviceAadApplication.HomePage
 
    Add-Content -Value "</tbody></table></body></html>" -Path createdApps.html  

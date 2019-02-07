@@ -52,7 +52,7 @@
         },
         {
           "key": "ida:Audience",
-          "value": "$serviceIdentifierUri"
+          "value": "$clientAadApplication.IdentifierUris"
         }
       ]
     },
@@ -76,7 +76,7 @@
         },
         {
           "key": "todo:TodoListResourceId",
-          "value": "$serviceIdentifierUri"
+          "value": "$clientAadApplication.IdentifierUris"
         },
         {
           "key": "todo:TodoListBaseAddress",
