@@ -49,8 +49,8 @@ This function removes the Azure AD applications for the sample. These applicatio
     # Removes the applications
     Write-Host "Cleaning-up applications from tenant '$tenantName'"
 
-    Write-Host "Removing 'service' (TodoListService_daemon_v1) if needed"
-    $app=Get-AzureADApplication -Filter "DisplayName eq 'TodoListService_daemon_v1'"  
+    Write-Host "Removing 'service' (todoListService_web_daemon_v1) if needed"
+    $app=Get-AzureADApplication -Filter "DisplayName eq 'todoListService_web_daemon_v1'"  
 
     if ($app)
     {
@@ -58,8 +58,8 @@ This function removes the Azure AD applications for the sample. These applicatio
         Write-Host "Removed."
     }
 
-    Write-Host "Removing 'client' (TodoList_daemon_v1) if needed"
-    $app=Get-AzureADApplication -Filter "DisplayName eq 'TodoList_daemon_v1'"  
+    Write-Host "Removing 'client' (todoList_web_daemon_v1) if needed"
+    $app=Get-AzureADApplication -Filter "DisplayName eq 'todoList_web_daemon_v1'"  
 
     if ($app)
     {

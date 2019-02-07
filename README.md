@@ -70,38 +70,38 @@ As a first step you'll need to:
    (using **Switch Directory**).
 1. In the left-hand navigation pane, select the **Azure Active Directory** service, and then select **App registrations (Preview)**.
 
-#### Register the service app (TodoListService_daemon_v1)
+#### Register the service app (todoListService_web_daemon_v1)
 
 1. In **App registrations (Preview)** page, select **New registration**.
 1. When the **Register an application page** appears, enter your application's registration information:
-   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `TodoListService_daemon_v1`.
-   - In the **Supported account types** section, select **Accounts in any organizational directory and personal Microsoft accounts (e.g. Skype, Xbox, Outlook.com)**.
+   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `todoListService_web_daemon_v1`.
+   - In the **Supported account types** section, select **Accounts in this organizational directory only ({tenant name})**.
    - In the Redirect URI (optional) section, select **Web** in the combo-box and enter the following redirect URIs.
        - `https://localhost:44321/`
 1. Select **Register** to create the application.
 1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
 1. In the list of pages for the app, select on **Expose an API**
+   - For **Application ID URI**, set it to  `https://<your_tenant_name>/todoListService_web_daemon_v1` and pres **Save**
    - Select **Add a scope**
-   - accept the proposed Application ID URI (api://{clientId}) by selecting **Save and Continue**
    - Enter the following parameters
      - for **Scope name** use `access_as_user`
      - Keep **Admins and users** for **Who can consent**
-     - in **Admin consent display name** type `Access TodoListService_daemon_v1 as a user`
-     - in **Admin consent description** type `Accesses the TodoListService_daemon_v1 Web API as a user`
-     - in **User consent display name** type `Access TodoListService_daemon_v1 as a user`
-     - in **User consent description** type `Accesses the TodoListService_daemon_v1 Web API as a user`
+     - in **Admin consent display name** type `Access todoListService_web_daemon_v1 as a user`
+     - in **Admin consent description** type `Accesses the todoListService_web_daemon_v1 Web API as a user`
+     - in **User consent display name** type `Access todoListService_web_daemon_v1 as a user`
+     - in **User consent description** type `Accesses the todoListService_web_daemon_v1 Web API as a user`
      - Keep **State** as **Enabled**
      - Select **Add scope**
 
-#### Register the client app (TodoList_daemon_v1)
+#### Register the client app (todoList_web_daemon_v1)
 
 1. In **App registrations (Preview)** page, select **New registration**.
 1. When the **Register an application page** appears, enter your application's registration information:
-   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `TodoList_daemon_v1`.
+   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `todoList_web_daemon_v1`.
    - In the **Supported account types** section, select **Accounts in any organizational directory and personal Microsoft accounts (e.g. Skype, Xbox, Outlook.com)**.
    - In the Redirect URI (optional) section, select **Web** in the combo-box.
       > Even if this is a desktop application, this is a confidential client application hence the *Application Type* being 'Web', which might seem counter intuitive.
-   - For the Redirect URI*, enter `https://<your_tenant_name>/TodoList_daemon_v1`, replacing `<your_tenant_name>` with the name of your Azure AD tenant.
+   - For the Redirect URI*, enter `https://<your_tenant_name>/todoList_web_daemon_v1`, replacing `<your_tenant_name>` with the name of your Azure AD tenant.
 1. Select **Register** to create the application.
 1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
 1. From the **Certificates & secrets** page, in the **Client secrets** section, choose **New client secret**:
@@ -114,12 +114,12 @@ As a first step you'll need to:
 1. In the list of pages for the app, select **API permissions**
    - Click the **Add a permission** button and then,
    - Ensure that the **My APIs** tab is selected
-   - In the list of APIs, select the API `TodoListService_daemon_v1`.
-   - In the **Delegated permissions** section, ensure that the right permissions are checked: **Access 'TodoListService_daemon_v1'**. Use the search box if necessary.
+   - In the list of APIs, select the API `todoListService_web_daemon_v1`.
+   - In the **Delegated permissions** section, ensure that the right permissions are checked: **Access 'todoListService_web_daemon_v1'**. Use the search box if necessary.
    - Select the **Add permissions** button
 
-1. At this stage permissions are assigned correctly but the client app does not allow interaction.
-   Therefore no consent can be presented via a UI and accepted to use the service app.
+1. At this stage permissions are assigned correctly but the client app does not allow interaction. 
+   Therefore no consent can be presented via a UI and accepted to use the service app. 
    Click the **Grant/revoke admin consent for {tenant}** button, and then select **Yes** when you are asked if you want to grant consent for the
    requested permissions for all account in the tenant.
    You need to be an Azure AD tenant admin to do this.
@@ -136,7 +136,7 @@ Open the solution in Visual Studio to configure the projects
 
 1. Open the `TodoListService\Web.Config` file
 1. Find the app key `ida:Tenant` and replace the existing value with your Azure AD tenant name.
-1. Find the app key `ida:Audience` and replace the existing value with the proposed Application ID URI `api://{clientId}`.
+1. Find the app key `ida:Audience` and replace the existing value with the App ID URI you registered earlier for the todoListService_web_daemon_v1 app. For instance use `https://<your_tenant_name>/todoListService_web_daemon_v1`, where `<your_tenant_name>` is the name of your Azure AD tenant.
 
 #### Configure the client project
 
@@ -144,10 +144,10 @@ Open the solution in Visual Studio to configure the projects
 
 1. Open the `TodoListDaemon\App.Config` file
 1. Find the app key `ida:Tenant` and replace the existing value with your Azure AD tenant name.
-1. Find the app key `ida:ClientId` and replace the existing value with the application ID (clientId) of the `TodoList_daemon_v1` application copied from the Azure portal.
-1. Find the app key `ida:AppKey` and replace the existing value with the key you saved during the creation of the `TodoList_daemon_v1` app, in the Azure portal.
-1. Find the app key `todo:TodoListResourceId` and replace the existing value with the proposed Application ID URI `api://{clientId}`.
-1. Find the app key `todo:TodoListBaseAddress` and replace the existing value with the base address of the TodoListService_daemon_v1 project (by default `https://localhost:44321/`).
+1. Find the app key `ida:ClientId` and replace the existing value with the application ID (clientId) of the `todoList_web_daemon_v1` application copied from the Azure portal.
+1. Find the app key `ida:AppKey` and replace the existing value with the key you saved during the creation of the `todoList_web_daemon_v1` app, in the Azure portal.
+1. Find the app key `todo:TodoListResourceId` and replace the existing value with the App ID URI you registered earlier for the todoListService_web_daemon_v1 app. For instance use `https://<your_tenant_name>/todoListService_web_daemon_v1`, where `<your_tenant_name>` is the name of your Azure AD tenant.
+1. Find the app key `todo:TodoListBaseAddress` and replace the existing value with the base address of the todoListService_web_daemon_v1 project (by default `https://localhost:44321/`).
 
 **NOTE:** The TodoListService's `ida:Audience` and TodoListDaemon's `todo:TodoListResourceId` app key values must not only match the App ID URI you configured, but they must also match each other exactly. This mach includes casing. Otherwise calls to the TodoListService /api/todolist endpoint will fail with "Error: unauthorized".
 
