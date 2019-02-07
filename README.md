@@ -5,7 +5,7 @@ author: jmprieur
 level: 200
 client: Desktop
 service: ASP.NET Web API
-endpoint: AAD V1
+endpoint: AAD v1.0
 ---
 # Calling a Web API in a daemon app or long-running process
 
@@ -26,7 +26,7 @@ This sample demonstrates a Desktop daemon application calling a ASP.NET Web API 
 
 Once the service started, when you start the `TodoListDaemon` desktop application, it repeatedly:
 
-- adds items to the todo list maintained by the service,
+- adds items to the todo list maintained by the service
 - lists the existing items.
 
 No user interaction is involved.
@@ -50,78 +50,79 @@ From your shell or command line:
 
 > Given that the name of the sample is pretty long, and so are the name of the referenced NuGet pacakges, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
 
-### Step 2:  Register the sample with your Azure Active Directory tenant
+### Step 2:  Register the sample application with your Azure Active Directory tenant
 
 There are two projects in this sample. Each needs to be separately registered in your Azure AD tenant. To register these projects, you can:
 
-- either follow the steps in the paragraphs below ([Step 2](#step-2--register-the-sample-with-your-azure-active-directory-tenant) and [Step 3](#step-3--configure-the-sample-to-use-your-azure-ad-tenant))
+- either follow the steps [Step 2: Register the sample with your Azure Active Directory tenant](#step-2-register-the-sample-with-your-azure-active-directory-tenant) and [Step 3:  Configure the sample to use your Azure AD tenant](#choose-the-azure-ad-tenant-where-you-want-to-create-your-applications)
 - or use PowerShell scripts that:
-  - **automatically** create for you the Azure AD applications and related objects (passwords, permissions, dependencies)
+  - **automatically** creates the Azure AD applications and related objects (passwords, permissions, dependencies) for you
   - modify the Visual Studio projects' configuration files.
 
 If you want to use this automation, read the instructions in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md)
 
-#### First step: choose the Azure AD tenant where you want to create your applications
+#### Choose the Azure AD tenant where you want to create your applications
 
 As a first step you'll need to:
 
-1. Sign in to the [Azure portal](https://portal.azure.com).
-1. On the top bar, click on your account, and then on **Switch Directory**.
-1. Once the *Directory + subscription* pane opens, choose the Active Directory tenant where you wish to register your application, from the *Favorites* or *All Directories* list.
-1. Click on **All services** in the left-hand nav, and choose **Azure Active Directory**.
+1. Sign in to the [Azure portal](https://portal.azure.com) using either a work or school account or a personal Microsoft account.
+1. If your account gives you access to more than one tenant, select your account in the top right corner, and set your portal session to the desired Azure AD tenant
+   (using **Switch Directory**).
+1. In the left-hand navigation pane, select the **Azure Active Directory** service, and then select **App registrations (Preview)**.
 
-> In the next steps, you might need the tenant name (or directory name) or the tenant ID (or directory ID). These are presented in the **Properties**
-of the Azure Active Directory window respectively as *Name* and *Directory ID*
+#### Register the service app (todoListService_web_daemon_v1)
 
-#### Register the service app (TodoListService Web API)
+1. In **App registrations (Preview)** page, select **New registration**.
+1. When the **Register an application page** appears, enter your application's registration information:
+   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `todoListService_web_daemon_v1`.
+   - In the **Supported account types** section, select **Accounts in this organizational directory only ({tenant name})**.
+   - In the Redirect URI (optional) section, select **Web** in the combo-box and enter the following redirect URIs.
+       - `https://localhost:44321/`
+1. Select **Register** to create the application.
+1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
+1. In the list of pages for the app, select on **Expose an API**
+   - For **Application ID URI**, set it to  `https://<your_tenant_name>/todoListService_web_daemon_v1` and pres **Save**
+   - Select **Add a scope**
+   - Enter the following parameters
+     - for **Scope name** use `access_as_user`
+     - Keep **Admins and users** for **Who can consent**
+     - in **Admin consent display name** type `Access todoListService_web_daemon_v1 as a user`
+     - in **Admin consent description** type `Accesses the todoListService_web_daemon_v1 Web API as a user`
+     - in **User consent display name** type `Access todoListService_web_daemon_v1 as a user`
+     - in **User consent description** type `Accesses the todoListService_web_daemon_v1 Web API as a user`
+     - Keep **State** as **Enabled**
+     - Select **Add scope**
 
-1. In the  **Azure Active Directory** pane, click on **App registrations** and choose **New application registration**.
-1. Enter a friendly name for the application, for example 'TodoListService' and select 'Web app / API' as the *Application Type*.
-1. For the *sign-on URL*, enter the base URL for the sample. By default, this sample uses `https://localhost:44321/`.
-1. Click **Create** to create the application.
-1. In the succeeding page, Find the *Application ID* value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
-1. Then click on **Settings**, and choose **Properties**.
-1. For the App ID URI, replace the guid in the generated URI 'https://\<your_tenant_name\>/\<guid\>', with the name of your service, for example, 'https://\<your_tenant_name\>/TodoListService' (replacing `<your_tenant_name>` with the name of your Azure AD tenant).
-1. [Optional]. The default value of "User assignment required" property is No for the newly created apps which allows any client app in the same tenant access the service, provided it adds a permission during the application registration. In case you want the Web API to restrict  access to only dameon apps having a certain role, you'd want to do the following: 
+#### Register the client app (todoList_web_daemon_v1)
 
-   - [set "User assignment required" property to Yes](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-restrict-your-app-to-a-set-of-users#update-the-app-to-enable-user-assignment) and 
-   - and create an application role in the service app manifest as below:
-   ```
-   "appRoles": [
-       {
-         "allowedMemberTypes": [
-           "Application"
-         ],
-         "displayName": "TodoListAdmin",
-         "id": "<Guid>",
-         "isEnabled": true,
-         "description": "Administrators can manage the todo list in their tenant",
-         "value": "TodoListAdmin"
-       }
-     ]
-     ```
-   - Replace `<Guid>` in the above manifest with a unique GUID in the following format 00000000-0000-0000-0000-000000000000 and save the manifest. We are creating an **Application** type role here for the daemon service.
-
-#### Register the client app (TodoListDaemon)
-
-1. In the  **Azure Active Directory** pane, click on **App registrations** and choose **New application registration**.
-1. Enter a friendly name for the application, for example 'TodoListDaemon' and select 'Web app / API' as the *Application Type*.
-   > Even if this is a desktop application, this is a confidential client application hence the Application Type being 'Web app / API', which is counter intuitive
-1. For the *Sign-on URL*, enter `https://<your_tenant_name>/TodoListDaemon`, replacing `<your_tenant_name>` with the name of your Azure AD tenant.
-1. Click **Create** to create the application.
-1. In the succeeding page, Find the *Application ID* value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
-1. Then click on **Settings**, and choose **Properties**.
-1. For the App ID URI, replace the guid in the generated URI 'https://\<your_tenant_name\>/\<guid\>', with the name of your service, for example, 'https://\<your_tenant_name\>/TodoListDaemon' (replacing `<your_tenant_name>` with the name of your Azure AD tenant)
-1. From the Settings menu, choose **Keys** and add a new entry in the Password section:
+1. In **App registrations (Preview)** page, select **New registration**.
+1. When the **Register an application page** appears, enter your application's registration information:
+   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `todoList_web_daemon_v1`.
+   - In the **Supported account types** section, select **Accounts in any organizational directory and personal Microsoft accounts (e.g. Skype, Xbox, Outlook.com)**.
+   - In the Redirect URI (optional) section, select **Web** in the combo-box.
+      > Even if this is a desktop application, this is a confidential client application hence the *Application Type* being 'Web', which might seem counter intuitive.
+   - For the Redirect URI*, enter `https://<your_tenant_name>/todoList_web_daemon_v1`, replacing `<your_tenant_name>` with the name of your Azure AD tenant.
+1. Select **Register** to create the application.
+1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
+1. From the **Certificates & secrets** page, in the **Client secrets** section, choose **New client secret**:
 
    - Type a key description (of instance `app secret`),
    - Select a key duration of either **In 1 year**, **In 2 years**, or **Never Expires**.
-   - When you save this page, the key value will be displayed, copy, and save the value in a safe location.
+   - When you press the **Add** button, the key value will be displayed, copy, and save the value in a safe location.
    - You'll need this key later to configure the project in Visual Studio. This key value will not be displayed again, nor retrievable by any other means,
      so record it as soon as it is visible from the Azure portal.
-1. Configure Permissions for your application. To that extent, in the Settings menu, choose the 'Required permissions' section and then,
-   click on **Add**, then **Select an API**, and type `TodoListService` in the textbox. Then, click on  **Select Permissions** and select **'TodoListAdmin'**. This will allow this client app to access the service app using TodoListAdmin role.
-1. At this stage permissions are assigned correctly but client app is a daemon service so it cannot accept the consent via UI to use the service app. To avoid this situation, please click on "Grant permissions" which will accept the consent for the app at the admin level.
+1. In the list of pages for the app, select **API permissions**
+   - Click the **Add a permission** button and then,
+   - Ensure that the **My APIs** tab is selected
+   - In the list of APIs, select the API `todoListService_web_daemon_v1`.
+   - In the **Delegated permissions** section, ensure that the right permissions are checked: **Access 'todoListService_web_daemon_v1'**. Use the search box if necessary.
+   - Select the **Add permissions** button
+
+1. At this stage permissions are assigned correctly but the client app does not allow interaction. 
+   Therefore no consent can be presented via a UI and accepted to use the service app. 
+   Click the **Grant/revoke admin consent for {tenant}** button, and then select **Yes** when you are asked if you want to grant consent for the
+   requested permissions for all account in the tenant.
+   You need to be an Azure AD tenant admin to do this.
 
 ### Step 3:  Configure the sample to use your Azure AD tenant
 
@@ -131,18 +132,22 @@ Open the solution in Visual Studio to configure the projects
 
 #### Configure the service project
 
+> Note: if you used the setup scripts, the changes below will have been applied for you
+
 1. Open the `TodoListService\Web.Config` file
 1. Find the app key `ida:Tenant` and replace the existing value with your Azure AD tenant name.
-1. Find the app key `ida:Audience` and replace the existing value with the App ID URI you registered earlier for the TodoListService app. For instance use `https://<your_tenant_name>/TodoListService`, where `<your_tenant_name>` is the name of your Azure AD tenant.
+1. Find the app key `ida:Audience` and replace the existing value with the App ID URI you registered earlier for the todoListService_web_daemon_v1 app. For instance use `https://<your_tenant_name>/todoListService_web_daemon_v1`, where `<your_tenant_name>` is the name of your Azure AD tenant.
 
 #### Configure the client project
 
+> Note: if you used the setup scripts, the changes below will have been applied for you
+
 1. Open the `TodoListDaemon\App.Config` file
 1. Find the app key `ida:Tenant` and replace the existing value with your Azure AD tenant name.
-1. Find the app key `ida:ClientId` and replace the existing value with the application ID (clientId) of the `TodoListDaemon` application copied from the Azure portal.
-1. Find the app key `ida:AppKey` and replace the existing value with the key you saved during the creation of the `TodoListDaemon` app, in the Azure portal.
-1. Find the app key `todo:TodoListResourceId` and replace the existing value with the App ID URI you registered earlier for the TodoListService app. For instance use `https://<your_tenant_name>/TodoListService`, where `<your_tenant_name>` is the name of your Azure AD tenant.
-1. Find the app key `todo:TodoListBaseAddress` and replace the existing value with the base address of the TodoListService project (by default `https://localhost:44321/`).
+1. Find the app key `ida:ClientId` and replace the existing value with the application ID (clientId) of the `todoList_web_daemon_v1` application copied from the Azure portal.
+1. Find the app key `ida:AppKey` and replace the existing value with the key you saved during the creation of the `todoList_web_daemon_v1` app, in the Azure portal.
+1. Find the app key `todo:TodoListResourceId` and replace the existing value with the App ID URI you registered earlier for the todoListService_web_daemon_v1 app. For instance use `https://<your_tenant_name>/todoListService_web_daemon_v1`, where `<your_tenant_name>` is the name of your Azure AD tenant.
+1. Find the app key `todo:TodoListBaseAddress` and replace the existing value with the base address of the todoListService_web_daemon_v1 project (by default `https://localhost:44321/`).
 
 **NOTE:** The TodoListService's `ida:Audience` and TodoListDaemon's `todo:TodoListResourceId` app key values must not only match the App ID URI you configured, but they must also match each other exactly. This mach includes casing. Otherwise calls to the TodoListService /api/todolist endpoint will fail with "Error: unauthorized".
 
@@ -249,7 +254,7 @@ Finally, in the properties of the solution itself, set both projects as startup 
 
 Use [Stack Overflow](http://stackoverflow.com/questions/tagged/adal) to get support from the community.
 Ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before.
-Make sure that your questions or comments are tagged with [`adal` `dotnet`].
+Make sure that your questions or comments are tagged with [`adal` `msal` `dotnet`].
 
 If you find a bug in the sample, please raise the issue on [GitHub Issues](../../issues).
 
@@ -265,7 +270,17 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 For more information, see ADAL.NET's conceptual documentation:
 
+> Provide links to the flows from the conceptual documentation and remove some that do not apply, like either keep ADAL or MSAL related links depending on the sample
+> for instance:
+- [Microsoft identity platform (Azure Active Directory for developers)](https://docs.microsoft.com/en-us/azure/active-directory/develop/)
+- [Quickstart: Register an application with the Microsoft identity platform (Preview)](https://docs.microsoft.com/azure/active-directory/develop/quickstart-register-app)
+- [Quickstart: Configure a client application to access web APIs (Preview)](https://docs.microsoft.com/azure/active-directory/develop/quickstart-configure-app-access-web-apis)
 - [Client credential flows](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Client-credential-flows)
+- [Using the acquired token to call a protected Web API](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Using-the-acquired-token-to-call-a-protected-Web-API)- [Client credential flows](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Client-credential-flows)
 - [Using the acquired token to call a protected Web API](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Using-the-acquired-token-to-call-a-protected-Web-API)
+- [ADAL.NET's conceptual documentation](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki)
+- [Recommended pattern to acquire a token](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/AcquireTokenSilentAsync-using-a-cached-token#recommended-pattern-to-acquire-a-token)
+- [Acquiring tokens interactively in public client applications](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Acquiring-tokens-interactively---Public-client-application-flows)
+- [National Clouds](https://docs.microsoft.com/en-us/azure/active-directory/develop/authentication-national-cloud#app-registration-endpoints)
 
 For more information about how OAuth 2.0 protocols work in this scenario and other scenarios, see [Authentication Scenarios for Azure AD](http://go.microsoft.com/fwlink/?LinkId=394414).

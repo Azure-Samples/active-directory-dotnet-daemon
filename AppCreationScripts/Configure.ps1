@@ -1,3 +1,10 @@
+[CmdletBinding()]
+param(
+    [PSCredential] $Credential,
+    [Parameter(Mandatory=$False, HelpMessage='Tenant ID (This is a GUID which represents the "Directory ID" of the AzureAD tenant into which you want to create the apps')]
+    [string] $tenantId
+)
+
 <#
  This script creates the Azure AD applications needed for this sample and updates the configuration files
  for the visual Studio projects from the data in the Azure AD applications.
@@ -119,15 +126,7 @@ Function ConfigureApplications
    configuration files in the client and service project  of the visual studio solution (App.Config and Web.Config)
    so that they are consistent with the Applications parameters
 #> 
-    [CmdletBinding()]
-    param(
-        [PSCredential] $Credential,
-        [Parameter(HelpMessage='Tenant ID (This is a GUID which represents the "Directory ID" of the AzureAD tenant into which you want to create the apps')]
-        [string] $tenantId
-    )
 
-   process
-   {
     # $tenantId is the Active Directory Tenant. This is a GUID which represents the "Directory ID" of the AzureAD tenant
     # into which you want to create the apps. Look it up in the Azure portal in the "Properties" of the Azure AD.
 
@@ -153,54 +152,84 @@ Function ConfigureApplications
     {
         $tenantId = $creds.Tenant.Id
     }
+
     $tenant = Get-AzureADTenantDetail
     $tenantName =  ($tenant.VerifiedDomains | Where { $_._Default -eq $True }).Name
 
+    # Get the user running the script
+    $user = Get-AzureADUser -ObjectId $creds.Account.Id
+
    # Create the service AAD application
-   Write-Host "Creating the AAD appplication (TodoListService)"
-   $serviceAadApplication = New-AzureADApplication -DisplayName "TodoListService" `
+   Write-Host "Creating the AAD application (todoListService_web_daemon_v1)"
+   $serviceAadApplication = New-AzureADApplication -DisplayName "todoListService_web_daemon_v1" `
                                                    -HomePage "https://localhost:44321/" `
-                                                   -IdentifierUris "https://$tenantName/TodoListService" `
+                                                   -ReplyUrls "https://localhost:44321/" `
+                                                   -IdentifierUris "https://$tenantName/todoListService_web_daemon_v1" `
+                                                   -AvailableToOtherTenants $False `
                                                    -PublicClient $False
 
 
    $currentAppId = $serviceAadApplication.AppId
    $serviceServicePrincipal = New-AzureADServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
-   Write-Host "Done."
+
+   # add the user running the script as an app owner if needed
+   $owner = Get-AzureADApplicationOwner -ObjectId $serviceAadApplication.ObjectId
+   if ($owner -eq $null)
+   { 
+    Add-AzureADApplicationOwner -ObjectId $serviceAadApplication.ObjectId -RefObjectId $user.ObjectId
+    Write-Host "'$($user.UserPrincipalName)' added as an application owner to app '$($serviceServicePrincipal.DisplayName)'"
+   }
+
+   Write-Host "Done creating the service application (todoListService_web_daemon_v1)"
 
    # URL of the AAD application in the Azure portal
-   $servicePortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_IAM/ApplicationBlade/appId/"+$serviceAadApplication.AppId+"/objectId/"+$serviceAadApplication.ObjectId
-   Add-Content -Value "<tr><td>service</td><td>$currentAppId</td><td><a href='$servicePortalUrl'>TodoListService</a></td></tr>" -Path createdApps.html
+   # Future? $servicePortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/"+$serviceAadApplication.AppId+"/objectId/"+$serviceAadApplication.ObjectId+"/isMSAApp/"
+   $servicePortalUrl = "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/CallAnAPI/appId/"+$serviceAadApplication.AppId+"/objectId/"+$serviceAadApplication.ObjectId+"/isMSAApp/"
+   Add-Content -Value "<tr><td>service</td><td>$currentAppId</td><td><a href='$servicePortalUrl'>todoListService_web_daemon_v1</a></td></tr>" -Path createdApps.html
 
    # Create the client AAD application
-   Write-Host "Creating the AAD appplication (TodoListDaemon)"
+   Write-Host "Creating the AAD application (todoList_web_daemon_v1)"
    # Get a 2 years application key for the client Application
    $pw = ComputePassword
    $fromDate = [DateTime]::Now;
    $key = CreateAppKey -fromDate $fromDate -durationInYears 2 -pw $pw
    $clientAppKey = $pw
-   $clientAadApplication = New-AzureADApplication -DisplayName "TodoListDaemon" `
-                                                  -IdentifierUris "https://$tenantName/TodoListDaemon" `
+   $clientAadApplication = New-AzureADApplication -DisplayName "todoList_web_daemon_v1" `
+                                                  -IdentifierUris "https://$tenantName/todoList_web_daemon_v1" `
+                                                  -AvailableToOtherTenants $True `
                                                   -PasswordCredentials $key `
                                                   -PublicClient $False
 
-
    $currentAppId = $clientAadApplication.AppId
    $clientServicePrincipal = New-AzureADServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
-   Write-Host "Done."
+
+   # add the user running the script as an app owner if needed
+   $owner = Get-AzureADApplicationOwner -ObjectId $clientAadApplication.ObjectId
+   if ($owner -eq $null)
+   { 
+    Add-AzureADApplicationOwner -ObjectId $clientAadApplication.ObjectId -RefObjectId $user.ObjectId
+    Write-Host "'$($user.UserPrincipalName)' added as an application owner to app '$($clientServicePrincipal.DisplayName)'"
+   }
+
+   Write-Host "Done creating the client application (todoList_web_daemon_v1)"
 
    # URL of the AAD application in the Azure portal
-   $clientPortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_IAM/ApplicationBlade/appId/"+$clientAadApplication.AppId+"/objectId/"+$clientAadApplication.ObjectId
-   Add-Content -Value "<tr><td>client</td><td>$currentAppId</td><td><a href='$clientPortalUrl'>TodoListDaemon</a></td></tr>" -Path createdApps.html
+   # Future? $clientPortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/"+$clientAadApplication.AppId+"/objectId/"+$clientAadApplication.ObjectId+"/isMSAApp/"
+   $clientPortalUrl = "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/CallAnAPI/appId/"+$clientAadApplication.AppId+"/objectId/"+$clientAadApplication.ObjectId+"/isMSAApp/"
+   Add-Content -Value "<tr><td>client</td><td>$currentAppId</td><td><a href='$clientPortalUrl'>todoList_web_daemon_v1</a></td></tr>" -Path createdApps.html
 
    $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
+
    # Add Required Resources Access (from 'client' to 'service')
    Write-Host "Getting access from 'client' to 'service'"
-   $requiredPermissions = GetRequiredPermissions -applicationDisplayName "TodoListService" `
-                                                 -requiredDelegatedPermissions "user_impersonation";
+   $requiredPermissions = GetRequiredPermissions -applicationDisplayName "todoListService_web_daemon_v1" `
+                                                -requiredDelegatedPermissions "user_impersonation" `
+
    $requiredResourcesAccess.Add($requiredPermissions)
+
+
    Set-AzureADApplication -ObjectId $clientAadApplication.ObjectId -RequiredResourceAccess $requiredResourcesAccess
-   Write-Host "Granted."
+   Write-Host "Granted permissions."
 
    # Update config file for 'service'
    $configFile = $pwd.Path + "\..\TodoListService\Web.Config"
@@ -216,11 +245,15 @@ Function ConfigureApplications
    ReplaceSetting -configFilePath $configFile -key "ida:AppKey" -newValue $clientAppKey
    ReplaceSetting -configFilePath $configFile -key "todo:TodoListResourceId" -newValue $serviceAadApplication.IdentifierUris
    ReplaceSetting -configFilePath $configFile -key "todo:TodoListBaseAddress" -newValue $serviceAadApplication.HomePage
-   Add-Content -Value "</tbody></table></body></html>" -Path createdApps.html
 
-  }
+   Add-Content -Value "</tbody></table></body></html>" -Path createdApps.html  
 }
 
+# Pre-requisites
+if ((Get-Module -ListAvailable -Name "AzureAD") -eq $null) { 
+    Install-Module "AzureAD" -Scope CurrentUser 
+} 
+Import-Module AzureAD
 
 # Run interactively (will ask you for the tenant ID)
 ConfigureApplications -Credential $Credential -tenantId $TenantId
