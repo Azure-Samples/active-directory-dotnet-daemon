@@ -17,6 +17,19 @@ param(
  There are four ways to run this script. For more information, read the AppCreationScripts.md file in the same folder as this script.
 #>
 
+Function CreateAppRole([string] $Name, [string] $Description)
+{
+    $appRole = New-Object Microsoft.Open.AzureAD.Model.AppRole
+    $appRole.AllowedMemberTypes = New-Object System.Collections.Generic.List[string]
+    $appRole.AllowedMemberTypes.Add("Application");
+    $appRole.DisplayName = $Name
+    $appRole.Id = New-Guid
+    $appRole.IsEnabled = $true
+    $appRole.Description = $Description
+    $appRole.Value = $Name;
+    return $appRole
+}
+
 # Create a password that can be used as an application key
 Function ComputePassword
 {
@@ -83,13 +96,15 @@ Function GetRequiredPermissions([string] $applicationDisplayName, [string] $requ
     $requiredAccess.ResourceAppId = $appid 
     $requiredAccess.ResourceAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.ResourceAccess]
 
-    # $sp.Oauth2Permissions | Select Id,AdminConsentDisplayName,Value: To see the list of all the Delegated permissions for the application:
+    # Write-Host("scopes " + $sp.Oauth2Permissions.Count)
+    # $sp.Oauth2Permissions | ForEach-Object {$_.Id, $_.AdminConsentDisplayName, $_.Value} #: To see the list of all the Delegated permissions for the application:
     if ($requiredDelegatedPermissions)
     {
         AddResourcePermission $requiredAccess -exposedPermissions $sp.Oauth2Permissions -requiredAccesses $requiredDelegatedPermissions -permissionType "Scope"
     }
     
-    # $sp.AppRoles | Select Id,AdminConsentDisplayName,Value: To see the list of all the Application permissions for the application
+    # Write-Host("app roles " + $sp.AppRoles.Count)
+    # $sp.AppRoles | Select -Property Id,AdminConsentDisplayName,Value #: To see the list of all the Application permissions for the application
     if ($requiredApplicationPermissions)
     {
         AddResourcePermission $requiredAccess -exposedPermissions $sp.AppRoles -requiredAccesses $requiredApplicationPermissions -permissionType "Role"
@@ -159,15 +174,19 @@ Function ConfigureApplications
     # Get the user running the script
     $user = Get-AzureADUser -ObjectId $creds.Account.Id
 
-   # Create the service AAD application
+   $accessasadminrole = CreateAppRole -Name "access_as_application" -Description  "Accesses the todoListService_web_daemon_v1 as an application."
+
+   $appRoles = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.AppRole]
+   $appRoles.Add($accessasadminrole)
+
    Write-Host "Creating the AAD application (todoListService_web_daemon_v1)"
    $serviceAadApplication = New-AzureADApplication -DisplayName "todoListService_web_daemon_v1" `
                                                    -HomePage "https://localhost:44321/" `
                                                    -ReplyUrls "https://localhost:44321/" `
-                                                   -IdentifierUris "https://$tenantName/todoListService_web_daemon_v1" `
                                                    -AvailableToOtherTenants $False `
+                                                   -IdentifierUris "https://$tenantName/todoListService_web_daemon_v1" `
+                                                   -AppRoles $appRoles `
                                                    -PublicClient $False
-
 
    $currentAppId = $serviceAadApplication.AppId
    $serviceServicePrincipal = New-AzureADServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
@@ -223,10 +242,9 @@ Function ConfigureApplications
    # Add Required Resources Access (from 'client' to 'service')
    Write-Host "Getting access from 'client' to 'service'"
    $requiredPermissions = GetRequiredPermissions -applicationDisplayName "todoListService_web_daemon_v1" `
-                                                -requiredDelegatedPermissions "user_impersonation" `
+                                                -requiredApplicationPermissions "access_as_application" `
 
    $requiredResourcesAccess.Add($requiredPermissions)
-
 
    Set-AzureADApplication -ObjectId $clientAadApplication.ObjectId -RequiredResourceAccess $requiredResourcesAccess
    Write-Host "Granted permissions."

@@ -82,16 +82,32 @@ As a first step you'll need to:
 1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
 1. In the list of pages for the app, select on **Expose an API**
    - For **Application ID URI**, set it to  `https://<your_tenant_name>/todoListService_web_daemon_v1` and pres **Save**
-   - Select **Add a scope**
-   - Enter the following parameters
-     - for **Scope name** use `access_as_user`
-     - Keep **Admins and users** for **Who can consent**
-     - in **Admin consent display name** type `Access todoListService_web_daemon_v1 as a user`
-     - in **Admin consent description** type `Accesses the todoListService_web_daemon_v1 Web API as a user`
-     - in **User consent display name** type `Access todoListService_web_daemon_v1 as a user`
-     - in **User consent description** type `Accesses the todoListService_web_daemon_v1 Web API as a user`
-     - Keep **State** as **Enabled**
-     - Select **Add scope**
+ 
+#### Step 2: Define your Application Roles (permission)
+
+1. While still in the blade for your  application, click **Manifest**.
+1. Edit the manifest by locating the `appRoles` setting and adding all four Application Roles.  The role definitions are provided in the JSON block below.  Leave the `allowedMemberTypes` to "User" only.  Each role definition in this manifest must have a different valid **Guid** for the "ID" property. Note that the `"value"` property of each role is set to the exact strings "Admin", "Approver", "Observer", and "Writer" (as these strings are used in the code in the application).
+1. Save the manifest.
+
+The content of `appRoles` should be the following (the `id` can be any unique GUID)
+
+```JSon
+"appRoles": [
+		{
+			"allowedMemberTypes": [
+				"Application"
+			],
+			"description": "Accesses the todoListService_web_daemon_v1 as an application.",
+			"displayName": "access_as_application",
+			"id": "ccf784a6-fd0c-45f2-9c08-2f9d162a0628",
+			"isEnabled": true,
+			"lang": null,
+			"origin": "Application",
+			"value": "access_as_application"
+		}
+	],
+
+```
 
 #### Register the client app (todoList_web_daemon_v1)
 
@@ -115,7 +131,7 @@ As a first step you'll need to:
    - Click the **Add a permission** button and then,
    - Ensure that the **My APIs** tab is selected
    - In the list of APIs, select the API `todoListService_web_daemon_v1`.
-   - In the **Delegated permissions** section, ensure that the right permissions are checked: **Access 'todoListService_web_daemon_v1'**. Use the search box if necessary.
+   - In the **Application Permissions** section, ensure that the right permissions are checked: **access_as_application'**. Use the search box if necessary.
    - Select the **Add permissions** button
 
 1. At this stage permissions are assigned correctly but the client app does not allow interaction. 
