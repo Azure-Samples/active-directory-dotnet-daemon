@@ -11,6 +11,13 @@ endpoint: AAD v1.0
 
 ![Build badge](https://identitydivision.visualstudio.com/_apis/public/build/definitions/a7934fdd-dcde-4492-a406-7fad6ac00e17/21/badge)
 
+
+> There's a newer version of this sample! Check it out: https://github.com/azure-samples/ms-identity-dotnetcore-daemon-console
+>
+> This newer sample takes advantage of the Microsoft identity platform (formerly Azure AD v2.0).
+>
+> While still in public preview, every component is supported in production environments
+
 ## About this sample
 
 ### Overview
@@ -21,12 +28,6 @@ This sample demonstrates a Desktop daemon application calling a ASP.NET Web API 
 2. The access token is used as a bearer token to authenticate the user when calling the `TodoListService` ASP.NET Web API.
 
 ![Overview](./ReadmeFiles/Topology.png)
-
-> There's a newer version of this sample! Check it out: https://github.com/azure-samples/ms-identity-dotnetcore-daemon-console
->
-> This newer sample takes advantage of the Microsoft identity platform (formerly Azure AD v2.0).
->
-> While still in public preview, every component is supported in production environments
 
 ### Scenario
 
