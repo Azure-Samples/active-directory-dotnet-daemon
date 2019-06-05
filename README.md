@@ -47,7 +47,7 @@ To run this sample, you'll need:
 - [Visual Studio 2017](https://aka.ms/vsdownload)
 - An Internet connection
 - An Azure Active Directory (Azure AD) tenant. For more information on how to get an Azure AD tenant, see [How to get an Azure AD tenant](https://azure.microsoft.com/en-us/documentation/articles/active-directory-howto-tenant/)
-- A user account in your Azure AD tenant. This sample will not work with a Microsoft account (formerly Windows Live account). Therefore, if you signed in to the [Azure portal](https://portal.azure.com) with a Microsoft account and have never created a user account in your directory before, you need to do that now.
+- A user account that is an **admin of your Azure AD tenant**. This sample will not work with a Microsoft account (formerly Windows Live account). Therefore, if you signed in to the [Azure portal](https://portal.azure.com) with a Microsoft account and have never created a user account in your directory before, you need to do that now.
 
 ### Step 1:  Clone or download this repository
 
@@ -79,56 +79,71 @@ As a first step you'll need to:
 
 #### Register the service app (todoListService_web_daemon_v1)
 
-1. In **App registrations (Preview)** page, select **New registration**.
+1. In **App registrations** page, select **New registration**.
 1. When the **Register an application page** appears, enter your application's registration information:
    - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `todoListService_web_daemon_v1`.
    - In the **Supported account types** section, select **Accounts in this organizational directory only ({tenant name})**.
-   - In the Redirect URI (optional) section, select **Web** in the combo-box and enter the following redirect URIs.
-       - `https://localhost:44321/`
 1. Select **Register** to create the application.
 1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
 1. In the list of pages for the app, select on **Expose an API**
    - For **Application ID URI**, set it to  `https://<your_tenant_name>/todoListService_web_daemon_v1` and pres **Save**
- 
-#### Step 2: Define your Application Roles (permission)
+
+#### Step 2: Secure your Web API by defining Application Roles (permission)
+
+If you don't do anything more, Azure AD will provide a token for any daemon application (using the client credential flow) requesting an access token for your Web API (for its App ID URI)
+In this step we are going to ensure that Azure AD only provides a token to the applications to which the Tenant admin grants consent. We are going to limit the access to our TodoList client by defining authorizations
+
+##### Add an app role to the manifest
 
 1. While still in the blade for your  application, click **Manifest**.
-1. Edit the manifest by locating the `appRoles` setting and adding all four Application Roles.  The role definitions are provided in the JSON block below.  Leave the `allowedMemberTypes` to "Application" only.  Each role definition in this manifest must have a different valid **Guid** for the "ID" property. Note that the `"value"` property of each role is set to the exact strings "Admin", "Approver", "Observer", and "Writer" (as these strings are used in the code in the application).
+1. Edit the manifest by locating the `appRoles` setting and adding an application roles. The role definition is provided in the JSON block below.  Leave the `allowedMemberTypes` to "Application" only.
 1. Save the manifest.
 
 The content of `appRoles` should be the following (the `id` can be any unique GUID)
 
 ```JSon
 "appRoles": [
-		{
-			"allowedMemberTypes": [
-				"Application"
-			],
-			"description": "Accesses the todoListService_web_daemon_v1 as an application.",
-			"displayName": "access_as_application",
-			"id": "ccf784a6-fd0c-45f2-9c08-2f9d162a0628",
-			"isEnabled": true,
-			"lang": null,
-			"origin": "Application",
-			"value": "access_as_application"
-		}
-	],
-
+	{
+	"allowedMemberTypes": [ "Application" ],
+	"description": "Accesses the todoListService_web_daemon_v1 as an application.",
+	"displayName": "access_as_application",
+	"id": "ccf784a6-fd0c-45f2-9c08-2f9d162a0628",
+	"isEnabled": true,
+	"lang": null,
+	"origin": "Application",
+	"value": "access_as_application"
+	}
+],
 ```
+
+##### Ensure that tokens Azure AD issues tokens for your Web API only to allowed clients
+
+The Web API tests for the app role (that's the developer way of doing it). But you can even ask Azure Active Directory to issue a token for your Web API only to applications which were approved by the tenant admin. For this:
+
+1. On the app **Overview** page for your app registration, select the hyperlink with the name of your application in **Managed application in local directory** (note this field title can be truncated for instance Managed application in ...)
+
+   > When you select this link you will navigate to the **Enterprise Application Overview** page associated with the service principal for your application in the tenant where you created it. You can navigate back to the app registration page by using the back button of your browser.
+
+1. Select the **Properties** page in the **Manage** section of the Enterprise application pages
+1. If you want AAD to enforce access to your Web API from only certain clients, set **User assignment required?** to **Yes**.
+
+   > **Important security tip**
+   >
+   > By setting **User assignment required?** to **Yes**, AAD will check the app role assignments of the clients when they request an access token for the Web API (see app permissions below). If the client was not be assigned to any AppRoles, AAD would just return `invalid_client: AADSTS501051: Application xxxx is not assigned to a role for the xxxx`
+   >
+   > If you keep **User assignment required?** to **No**, <span style='background-color:yellow; display:inline'>Azure AD  won’t check the app role assignments  when a client requests an access token to your Web API</span>. Therefore, any daemon client (that is any client using client credentials flow) would still be able to obtain the access token for the  Web API just by specifying its audience. Any application, would be able to access the API without having to request permissions for it. Now this is not then end of it, as your Web API can always, as is done in this sample, verify that the application has the right role (which was authorized by the tenant admin), by validating that the access token has a roles claim, and 
+
+1. Select **Save**
 
 #### Register the client app (todoList_web_daemon_v1)
 
-1. In **App registrations (Preview)** page, select **New registration**.
+1. In **App registrations** page, select **New registration**.
 1. When the **Register an application page** appears, enter your application's registration information:
    - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `todoList_web_daemon_v1`.
-   - In the **Supported account types** section, select **Accounts in any organizational directory and personal Microsoft accounts (e.g. Skype, Xbox, Outlook.com)**.
-   - In the Redirect URI (optional) section, select **Web** in the combo-box.
-      > Even if this is a desktop application, this is a confidential client application hence the *Application Type* being 'Web', which might seem counter intuitive.
-   - For the Redirect URI*, enter `https://<your_tenant_name>/todoList_web_daemon_v1`, replacing `<your_tenant_name>` with the name of your Azure AD tenant.
+   - In the **Supported account types** section, **Accounts in this organizational directory only ({tenant name})**.
 1. Select **Register** to create the application.
 1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
 1. From the **Certificates & secrets** page, in the **Client secrets** section, choose **New client secret**:
-
    - Type a key description (of instance `app secret`),
    - Select a key duration of either **In 1 year**, **In 2 years**, or **Never Expires**.
    - When you press the **Add** button, the key value will be displayed, copy, and save the value in a safe location.
@@ -137,13 +152,12 @@ The content of `appRoles` should be the following (the `id` can be any unique GU
 1. In the list of pages for the app, select **API permissions**
    - Click the **Add a permission** button and then,
    - Ensure that the **My APIs** tab is selected
-   - In the list of APIs, select the API `todoListService_web_daemon_v1`.
-   - In the **Application Permissions** section, ensure that the right permissions are checked: **access_as_application'**. Use the search box if necessary.
-   - Select the **Add permissions** button
+   - In the list of APIs, select the API `todoListService_web_daemon_v1`
+     - In the **Application Permissions** section, ensure that the right permissions are checked: **access_as_application'**. Use the search box if necessary.
+     - Select the **Add permissions** button
+1. You can remove the default permission **User.Read** as our client is a daemon app. there is no user.
 
-1. At this stage permissions are assigned correctly but the client app does not allow interaction. 
-   Therefore no consent can be presented via a UI and accepted to use the service app. 
-   Click the **Grant/revoke admin consent for {tenant}** button, and then select **Yes** when you are asked if you want to grant consent for the
+1. At this stage permissions are assigned correctly. However, by definition, daemon applications does not allow interaction. Therefore no consent can be presented via a UI and accepted to use the service app. The tenant admin need to consent for the client to access your application. for this Click the **Grant/revoke admin consent for {tenant}** button, and then select **Yes** when you are asked if you want to grant consent for the
    requested permissions for all account in the tenant.
    You need to be an Azure AD tenant admin to do this.
 
@@ -217,6 +231,8 @@ Also, if you increase the instance count of the web site, requests will be distr
 
 ## About The Code
 
+### Client side: the daemon app
+
 The code acquiring a token is located entirely in the `TodoListDaemon\Program.cs` file.
 The `Authentication` context is created (line 68)
 
@@ -240,6 +256,48 @@ This token is then used as a bearer token to call the Web API (line 127 and 193)
 
 ```CSharp
 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken)
+```
+
+### Service side: how the protected API
+
+On the service side, the code directing ASP.NET to validate the access token is in `App_Start\Startup.Auth.cs`. It only validates the audience of the application (the App ID URI)
+
+```CSharp
+ public partial class Startup
+ {
+  // For more information on configuring authentication, please visit http://go.microsoft.com/fwlink/?LinkId=301864
+  public void ConfigureAuth(IAppBuilder app)
+  {
+   app.UseWindowsAzureActiveDirectoryBearerAuthentication(
+      new WindowsAzureActiveDirectoryBearerAuthenticationOptions
+      {
+       Tenant = ConfigurationManager.AppSettings["ida:Tenant"],
+       TokenValidationParameters = new TokenValidationParameters
+       {
+        ValidAudience = ConfigurationManager.AppSettings["ida:Audience"]
+       }
+      });
+   }
+}
+```
+
+However, the controllers also validate that the client has a `roles` claim of value `access_as_application`. It returns an Unauthorized error otherwise.
+
+```CSharp
+ public IEnumerable<TodoItem> Get()
+ {
+  //
+  // The roles claim tells what permissions the client application has in the service.
+  // In this case we look for a roles value of access_as_application
+  //
+  Claim scopeClaim = ClaimsPrincipal.Current.FindFirst("roles");
+  if (scopeClaim == null || (scopeClaim.Value != "access_as_application"))
+  {
+   throw new HttpResponseException(new HttpResponseMessage { StatusCode = HttpStatusCode.Unauthorized,
+      ReasonPhrase = "The 'roles' claim does not contain 'access_as_application'or was not found" });
+  }
+  ...
+ }
 ```
 
 ## How to recreate this sample
