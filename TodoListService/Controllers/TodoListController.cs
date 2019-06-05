@@ -46,16 +46,13 @@ namespace TodoListService.Controllers
         public IEnumerable<TodoItem> Get()
         {
             //
-            // The Scope claim tells you what permissions the client application has in the service.
-            // In this case we look for a scope value of user_impersonation, or full access to the service as the user.
+            // The `role` claim tells you what permissions the client application has in the service.
+            // In this case we look for a  `role` value of `access_as_application`
             //
-            Claim scopeClaim = ClaimsPrincipal.Current.FindFirst("http://schemas.microsoft.com/identity/claims/scope");
-            if (scopeClaim != null)
+            Claim scopeClaim = ClaimsPrincipal.Current.FindFirst("roles");
+            if (scopeClaim == null || (scopeClaim.Value != "access_as_application"))
             {
-                if (scopeClaim.Value != "user_impersonation")
-                {
-                    throw new HttpResponseException(new HttpResponseMessage { StatusCode = HttpStatusCode.Unauthorized, ReasonPhrase = "The Scope claim does not contain 'user_impersonation' or scope claim not found" });
-                }
+                throw new HttpResponseException(new HttpResponseMessage { StatusCode = HttpStatusCode.Unauthorized, ReasonPhrase = "The 'roles' claim does not contain 'access_as_application'or was not found" });
             }
 
             // A user's To Do list is keyed off of the NameIdentifier claim, which contains an immutable, unique identifier for the user.
@@ -69,13 +66,10 @@ namespace TodoListService.Controllers
         // POST api/todolist
         public void Post(TodoItem todo)
         {
-            Claim scopeClaim = ClaimsPrincipal.Current.FindFirst("http://schemas.microsoft.com/identity/claims/scope");
-            if (scopeClaim != null)
+            Claim scopeClaim = ClaimsPrincipal.Current.FindFirst("roles");
+            if (scopeClaim == null || (scopeClaim.Value != "access_as_application"))
             {
-                if (scopeClaim.Value != "user_impersonation")
-                {
-                    throw new HttpResponseException(new HttpResponseMessage { StatusCode = HttpStatusCode.Unauthorized, ReasonPhrase = "The Scope claim does not contain 'user_impersonation' or scope claim not found" });
-                }
+                throw new HttpResponseException(new HttpResponseMessage { StatusCode = HttpStatusCode.Unauthorized, ReasonPhrase = "The 'roles' claim does not contain 'access_as_application' or was not found" });
             }
 
             if (null != todo && !string.IsNullOrWhiteSpace(todo.Title))
