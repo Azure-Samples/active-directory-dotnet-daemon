@@ -36,6 +36,7 @@ using System.Threading;
 using System.Net.Http.Headers;
 using System.Web.Script.Serialization;
 using System.Configuration;
+using System.Net;
 
 namespace TodoListDaemon
 {
@@ -139,7 +140,8 @@ namespace TodoListDaemon
             Console.WriteLine("Posting to To Do list at {0}", timeNow);
             string todoText = "Task at time: " + timeNow;
             HttpContent content = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("Title", todoText) });
-            HttpResponseMessage response = await httpClient.PostAsync(todoListBaseAddress + "/api/todolist", content);
+			ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+			HttpResponseMessage response = await httpClient.PostAsync(todoListBaseAddress + "/api/todolist", content);
 
             if (response.IsSuccessStatusCode == true)
             {
