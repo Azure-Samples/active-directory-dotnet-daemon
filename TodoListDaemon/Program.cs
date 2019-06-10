@@ -36,6 +36,7 @@ using System.Threading;
 using System.Net.Http.Headers;
 using System.Web.Script.Serialization;
 using System.Configuration;
+using System.Net;
 
 namespace TodoListDaemon
 {
@@ -192,7 +193,7 @@ namespace TodoListDaemon
                 Console.WriteLine("Canceling attempt to contact To Do list service.\n");
                 return;
             }
-            
+
             //
             // Read items from the To Do list service.
             //
