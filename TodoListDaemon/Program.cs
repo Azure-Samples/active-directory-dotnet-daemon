@@ -140,8 +140,7 @@ namespace TodoListDaemon
             Console.WriteLine("Posting to To Do list at {0}", timeNow);
             string todoText = "Task at time: " + timeNow;
             HttpContent content = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("Title", todoText) });
-
-			HttpResponseMessage response = await httpClient.PostAsync(todoListBaseAddress + "/api/todolist", content);
+            HttpResponseMessage response = await httpClient.PostAsync(todoListBaseAddress + "/api/todolist", content);
 
             if (response.IsSuccessStatusCode == true)
             {
@@ -194,7 +193,7 @@ namespace TodoListDaemon
                 Console.WriteLine("Canceling attempt to contact To Do list service.\n");
                 return;
             }
-            
+
             //
             // Read items from the To Do list service.
             //
