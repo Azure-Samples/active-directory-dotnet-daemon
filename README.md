@@ -15,8 +15,7 @@ endpoint: AAD v1.0
 > There's a newer version of this sample! Check it out: https://github.com/azure-samples/ms-identity-dotnetcore-daemon-console
 >
 > This newer sample takes advantage of the Microsoft identity platform (formerly Azure AD v2.0).
->
-> While still in public preview, every component is supported in production environments
+
 
 ## About this sample
 
